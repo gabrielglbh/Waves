@@ -56,6 +56,7 @@ class SongListController: UITableViewController {
         name.remove(at: name.startIndex)
         
         cell.textLabel?.text = name
+        cell.textLabel?.font = UIFont.boldSystemFont(ofSize: 20)
         cell.detailTextLabel?.text = artist
         cell.imageView?.image = UIImage(named: "album")
 

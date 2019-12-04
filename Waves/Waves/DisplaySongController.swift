@@ -221,11 +221,12 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
                 
                 setPlayerToNewSong(newSong)
                 
-                let parted = next.components(separatedBy: "-")
+                let parted = next.components(separatedBy: "- ")
                 let artist = parted[0]
                 let title = parted[1].components(separatedBy: ".mp3")[0]
                 
                 songName?.text = title
+                songName?.font = UIFont.boldSystemFont(ofSize: 23)
                 songArtist?.text = artist
             }
         }
