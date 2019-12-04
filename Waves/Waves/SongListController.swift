@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import AVFoundation
 
 class SongListController: UITableViewController {
 
@@ -14,6 +15,10 @@ class SongListController: UITableViewController {
     var files: [String]?
     var fm: FileManager!
     
+    var player: AVAudioPlayer!
+    var isPlaying = false
+    var currentSongPlaying: UITableViewCell?
+        
     override func viewDidLoad() {
         super.viewDidLoad()
         self.navigationItem.rightBarButtonItem = self.editButtonItem
@@ -56,7 +61,7 @@ class SongListController: UITableViewController {
         name.remove(at: name.startIndex)
         
         cell.textLabel?.text = name
-        cell.textLabel?.font = UIFont.boldSystemFont(ofSize: 20)
+        cell.textLabel?.font = UIFont.boldSystemFont(ofSize: 18)
         cell.detailTextLabel?.text = artist
         cell.imageView?.image = UIImage(named: "album")
 
@@ -87,6 +92,10 @@ class SongListController: UITableViewController {
         files!.insert(song, at: to.row)
     }
     
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
+    
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         return true
     }
@@ -97,6 +106,42 @@ class SongListController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
         return .delete
+    }
+    
+    /**
+    * Nombre explanatorio: actualiza la IU y la canción en función de la pulsación del boton
+    * de play/pause
+    */
+    @IBAction private func manageSong() {
+        if isPlaying {
+            // currentSongPlaying?.imageView?.image = UIImage(systemName: "play.fill")
+            player.pause()
+        } else {
+            // currentSongPlaying?.imageView?.image = UIImage(systemName: "pause.fill")
+            player.play()
+        }
+        isPlaying = !isPlaying
+    }
+    
+    /**
+     * unwindToController: Al ir de la preview de la cancion a la lista, recoge si hay alguna cancion reproduciendose.
+     * Si la hay, se actualizará la IU.
+     */
+    @IBAction func unwindToSongList(_ unwind: UIStoryboardSegue) {
+        let view = unwind.source as! DisplaySongController
+        resetUIList()
+        
+        if view.isPlaying {
+            let cellOfPlayingSong = tableView.cellForRow(at: IndexPath(row: view.actualSongIndex!,
+                                                                                  section: 0))
+            cellOfPlayingSong?.textLabel?.textColor = UIColor.systemYellow
+            cellOfPlayingSong?.detailTextLabel?.textColor = UIColor.systemYellow
+            // cellOfPlayingSong?.imageView?.image = UIImage(systemName: "pause.fill")
+            currentSongPlaying = cellOfPlayingSong
+            
+            self.player = view.player
+            self.isPlaying = view.isPlaying
+        }
     }
 
     /**
@@ -115,6 +160,11 @@ class SongListController: UITableViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "goToPlaySong" {
             if (segue.destination.view != nil) {
+                if isPlaying { player.pause() }
+                
+                // TODO: Si song == songPlaying, entrar a la view con los parametros
+                //  del timer puestos con self.player
+                
                 let view = segue.destination as! DisplaySongController
                 
                 let song = files![tableView.indexPathForSelectedRow!.row]
@@ -128,12 +178,19 @@ class SongListController: UITableViewController {
                 let parted = song.components(separatedBy: "-")
                 let artist = parted[0]
                 let title = parted[1].components(separatedBy: ".mp3")[0]
-                
-                view.title = ""
         
                 view.songName?.text = title
                 view.songArtist?.text = artist
             }
+        }
+    }
+    
+    private func resetUIList() {
+        for song in 0...files!.count {
+            let cell = tableView.cellForRow(at: IndexPath(row: song, section: 0))
+            cell?.textLabel?.textColor = UIColor.white
+            cell?.detailTextLabel?.textColor = UIColor.white
+            cell?.imageView?.image = UIImage(named: "album")
         }
     }
 }

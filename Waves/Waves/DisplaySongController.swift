@@ -8,6 +8,7 @@
 
 import UIKit
 import AVFoundation
+import MediaPlayer
 
 class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
 
@@ -25,6 +26,7 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
     var isRepeatModeActive = false
     var isShuffleModeActive = false
     
+    
     @IBOutlet var songName: UILabel?
     @IBOutlet var songArtist: UILabel?
     @IBOutlet var initialTime: UILabel?
@@ -39,11 +41,15 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
     @IBOutlet var portrait: UIImageView?
     
     /**
-     * viewDidLoad: Se crea la URL para acceder a las canciones y se agranda en altura la progress bar
+     * viewDidLoad: Se crea la URL para acceder a las canciones y se agranda en altura la progress bar.
+     * Se crean los manejadores para la LockScreen y el Control Center de iOS para la cancion
      */
     override func viewDidLoad() {
         super.viewDidLoad()
         docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        setupRemoteControls()
+        setuUpSongForLockScreen()
+        title = ""
     }
     
     /**
@@ -52,8 +58,9 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
      */
     override func viewWillAppear(_ animated: Bool) {
         do {
-            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [.mixWithOthers, .allowAirPlay])
-            try AVAudioSession.sharedInstance().setActive(false)
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default,
+                                                            options: [.mixWithOthers, .allowAirPlay])
+            try AVAudioSession.sharedInstance().setActive(true)
         } catch {
             print(error)
         }
@@ -64,16 +71,16 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
         navigationController!.navigationBar.barTintColor = UIColor.darkGray
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
-        // ¿qué método llama el root view back para pasar parámetros a la lista desde aquí?
-    }
-    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "loadLyrics" {
             if (segue.destination.view != nil) {
-                (segue.destination as! LyricsViewController).title = songName!.text! + "-" + songArtist!.text!
+                (segue.destination as! LyricsViewController).nameQuery = songName!.text!
             }
         }
+    }
+    
+    @IBAction func goBackToList(_ sender: Any) {
+        performSegue(withIdentifier: "getPlayedSong", sender: self)
     }
     
     // Nombre explanatorio
@@ -148,6 +155,59 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
      */
     func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
         goNextOrPreviousSong(true)
+    }
+    
+    /**
+     * setupRemoteTransportControls: Crea los manejadores para siguiente, anterior, pausa y play en el lock screen.
+     */
+    private func setupRemoteControls() {
+        let commandCenter = MPRemoteCommandCenter.shared()
+
+        commandCenter.playCommand.addTarget { [unowned self] event in
+            if self.player.rate == 0.0 {
+                self.player.play()
+                return .success
+            }
+            return .commandFailed
+        }
+
+        commandCenter.pauseCommand.addTarget { [unowned self] event in
+            if self.player.rate == 1.0 {
+                self.player.pause()
+                return .success
+            }
+            return .commandFailed
+        }
+        
+        commandCenter.nextTrackCommand.addTarget { [unowned self] event in
+            self.goNextOrPreviousSong(true)
+            return .success
+        }
+        
+        commandCenter.previousTrackCommand.addTarget { [unowned self] event in
+            self.goNextOrPreviousSong(false)
+            return .success
+        }
+    }
+    
+    /**
+     * setUpNowPlaying: Crea los datos a mostrar en la lock screen de la cancion actual
+     */
+    private func setuUpSongForLockScreen() {
+        var nowPlayingInfo = [String : Any]()
+        nowPlayingInfo[MPMediaItemPropertyTitle] = songName!.text! + "-" + songArtist!.text!
+
+        if let image = UIImage(named: "album") {
+            nowPlayingInfo[MPMediaItemPropertyArtwork] =
+                MPMediaItemArtwork(boundsSize: image.size) { size in
+                    return image
+            }
+        }
+        /*nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = player.currentTime
+        nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = player.duration
+        nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = player.rate*/
+
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
     }
     
     /**
