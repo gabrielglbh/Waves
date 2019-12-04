@@ -9,6 +9,8 @@
 import UIKit
 
 class LyricsViewController: UIViewController {
+    
+    @IBOutlet var lyrics: UITextView!
 
     override func viewDidLoad() {
         super.viewDidLoad()
