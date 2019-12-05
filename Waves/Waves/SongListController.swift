@@ -9,7 +9,7 @@
 import UIKit
 import AVFoundation
 
-class SongListController: UITableViewController {
+class SongListController: UITableViewController, AVAudioPlayerDelegate {
 
     var docs: URL!
     var files: [String]?
@@ -18,6 +18,9 @@ class SongListController: UITableViewController {
     var player: AVAudioPlayer!
     var isPlaying = false
     var currentSongPlaying: UITableViewCell?
+    
+    @IBOutlet var controlSong: UIToolbar!
+    @IBOutlet var playButton: UIBarButtonItem!
         
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,6 +28,7 @@ class SongListController: UITableViewController {
         self.editButtonItem.tintColor = UIColor.systemYellow
         
         self.title = "Mis Canciones"
+        controlSong?.isHidden = true
         
         fm = FileManager.default
         docs = fm.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -109,15 +113,22 @@ class SongListController: UITableViewController {
     }
     
     /**
-    * Nombre explanatorio: actualiza la IU y la canción en función de la pulsación del boton
-    * de play/pause
+     * audioPlayerDidFinishPlaying: Cuando la canción ha terminado de reproducirse, se pasa y reproduce la siguiente canción
+     */
+    func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
+        // TODO
+    }
+    
+    /**
+    * didSelect: Delegado de UITabBar. Actualiza la IU y la canción en función de la pulsación del boton
+    * de play/pause, y siguiente/anterior cancion
     */
-    @IBAction private func manageSong() {
+    @IBAction private func managePlayAction() {
         if isPlaying {
-            // currentSongPlaying?.imageView?.image = UIImage(systemName: "play.fill")
+            playButton?.image = UIImage(systemName: "play.fill")
             player.pause()
         } else {
-            // currentSongPlaying?.imageView?.image = UIImage(systemName: "pause.fill")
+            playButton?.image = UIImage(systemName: "pause.fill")
             player.play()
         }
         isPlaying = !isPlaying
@@ -136,11 +147,15 @@ class SongListController: UITableViewController {
                                                                                   section: 0))
             cellOfPlayingSong?.textLabel?.textColor = UIColor.systemYellow
             cellOfPlayingSong?.detailTextLabel?.textColor = UIColor.systemYellow
-            // cellOfPlayingSong?.imageView?.image = UIImage(systemName: "pause.fill")
+            playButton?.image = UIImage(systemName: "pause.fill")
             currentSongPlaying = cellOfPlayingSong
             
             self.player = view.player
             self.isPlaying = view.isPlaying
+            
+            controlSong?.isHidden = false
+        } else {
+            controlSong?.isHidden = true
         }
     }
 
