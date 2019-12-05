@@ -26,7 +26,6 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
     var isRepeatModeActive = false
     var isShuffleModeActive = false
     
-    
     @IBOutlet var songName: UILabel?
     @IBOutlet var songArtist: UILabel?
     @IBOutlet var initialTime: UILabel?
@@ -69,6 +68,7 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
         
         navigationController!.navigationBar.tintColor = UIColor.systemYellow
         navigationController!.navigationBar.barTintColor = UIColor.darkGray
+        navigationController!.isToolbarHidden = true
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {

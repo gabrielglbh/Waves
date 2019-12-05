@@ -19,8 +19,8 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
     var isPlaying = false
     var currentSongPlaying: UITableViewCell?
     
-    @IBOutlet var controlSong: UIToolbar!
-    @IBOutlet var playButton: UIBarButtonItem!
+    var playButton: UIBarButtonItem!
+    var songToolbarText: UIBarButtonItem!
         
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -28,7 +28,8 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
         self.editButtonItem.tintColor = UIColor.systemYellow
         
         self.title = "Mis Canciones"
-        controlSong?.isHidden = true
+        
+        setToolbar()
         
         fm = FileManager.default
         docs = fm.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -39,9 +40,26 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        navigationController?.navigationBar.titleTextAttributes =
+        navigationController!.navigationBar.titleTextAttributes =
             [NSAttributedString.Key.foregroundColor: UIColor.systemYellow]
         navigationController!.navigationBar.barTintColor = UIColor.darkGray
+    }
+    
+    private func setToolbar() {
+        var items = [UIBarButtonItem]()
+        
+        playButton = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: #selector(managePlayAction))
+        playButton.tintColor = UIColor.white
+        items.append(playButton)
+
+        songToolbarText = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
+        songToolbarText.tintColor = UIColor.white
+        items.append(songToolbarText)
+
+        //setToolbarItems(items, animated: true)
+        //navigationController!.toolbar.setItems(items, animated: true)
+        navigationController!.toolbar.items = items
+        navigationController!.toolbar.barTintColor = UIColor.darkGray
     }
 
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -116,14 +134,14 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
      * audioPlayerDidFinishPlaying: Cuando la canción ha terminado de reproducirse, se pasa y reproduce la siguiente canción
      */
     func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
-        // TODO
+        player.stop()
     }
     
     /**
     * didSelect: Delegado de UITabBar. Actualiza la IU y la canción en función de la pulsación del boton
     * de play/pause, y siguiente/anterior cancion
     */
-    @IBAction private func managePlayAction() {
+    @objc private func managePlayAction() {
         if isPlaying {
             playButton?.image = UIImage(systemName: "play.fill")
             player.pause()
@@ -148,14 +166,14 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
             cellOfPlayingSong?.textLabel?.textColor = UIColor.systemYellow
             cellOfPlayingSong?.detailTextLabel?.textColor = UIColor.systemYellow
             playButton?.image = UIImage(systemName: "pause.fill")
-            currentSongPlaying = cellOfPlayingSong
+            songToolbarText?.title = cellOfPlayingSong!.textLabel!.text! + " - " + cellOfPlayingSong!.detailTextLabel!.text!
             
             self.player = view.player
             self.isPlaying = view.isPlaying
             
-            controlSong?.isHidden = false
+            navigationController!.isToolbarHidden = false
         } else {
-            controlSong?.isHidden = true
+            navigationController!.isToolbarHidden = true
         }
     }
 

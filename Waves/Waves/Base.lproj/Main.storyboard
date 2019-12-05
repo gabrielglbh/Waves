@@ -211,21 +211,6 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" cocoaTouchSystemColor="scrollViewTexturedBackgroundColor"/>
-                        <toolbar key="tableFooterView" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="0Ms-88-o4W">
-                            <rect key="frame" x="0.0" y="146" width="414" height="44"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                            <items>
-                                <barButtonItem title="Anterior" image="backward.end.fill" catalog="system" width="164" style="plain" id="ECr-kC-KEj"/>
-                                <barButtonItem title="Pausa" image="pause.fill" catalog="system" width="320" id="piy-Ur-tZI">
-                                    <connections>
-                                        <action selector="managePlayAction" destination="E3h-BT-got" id="4UH-gg-47Q"/>
-                                    </connections>
-                                </barButtonItem>
-                                <barButtonItem title="Siguiente" image="forward.end.fill" catalog="system" width="481" id="5ey-Ye-3rK"/>
-                            </items>
-                            <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                            <color key="barTintColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                        </toolbar>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="gray" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="Cell" textLabel="ord-Bf-3zi" detailTextLabel="N9R-Lp-LNl" imageView="HT1-ax-aBF" rowHeight="90" style="IBUITableViewCellStyleSubtitle" id="6Xv-XT-W6F">
                                 <rect key="frame" x="0.0" y="28" width="414" height="90"/>
@@ -269,10 +254,6 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Root View Controller" id="AQE-GA-oS9"/>
-                    <connections>
-                        <outlet property="controlSong" destination="0Ms-88-o4W" id="OhB-ju-fSi"/>
-                        <outlet property="playButton" destination="piy-Ur-tZI" id="e98-y3-3LL"/>
-                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="5mM-NM-pTd" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
@@ -301,7 +282,6 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
         <image name="forward.end.fill" catalog="system" width="64" height="50"/>
         <image name="music.note" catalog="system" width="48" height="64"/>
         <image name="pause.circle.fill" catalog="system" width="64" height="60"/>
-        <image name="pause.fill" catalog="system" width="58" height="64"/>
         <image name="repeat" catalog="system" width="64" height="48"/>
         <image name="shuffle" catalog="system" width="64" height="46"/>
     </resources>
