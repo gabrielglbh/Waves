@@ -21,6 +21,8 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
     
     var playButton: UIBarButtonItem!
     var songToolbarText: UIBarButtonItem!
+    
+    var cellOfPlayingSong: UITableViewCell?
         
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -28,8 +30,6 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
         self.editButtonItem.tintColor = UIColor.systemYellow
         
         self.title = "Mis Canciones"
-        
-        setToolbar()
         
         fm = FileManager.default
         docs = fm.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -43,23 +43,23 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
         navigationController!.navigationBar.titleTextAttributes =
             [NSAttributedString.Key.foregroundColor: UIColor.systemYellow]
         navigationController!.navigationBar.barTintColor = UIColor.darkGray
+        
+        navigationController!.toolbar.barTintColor = UIColor.darkGray
     }
     
-    private func setToolbar() {
-        var items = [UIBarButtonItem]()
+    override func viewDidAppear(_ animated: Bool) {
+        if isPlaying == true { setToolbarButtonsForPlayingSong("pause.fill") }
+    }
+    
+    /**
+     * setToolbarButtonsForPlayingSong: Crea una customToolbar para la reproduccion de una cancion
+     */
+    private func setToolbarButtonsForPlayingSong(_ button: String) {
+        let playButton = createCustomButton(button, nil)
+        let songToolbarText = createCustomButton(nil, "     " + cellOfPlayingSong!.textLabel!.text!)
+        let blank = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
         
-        playButton = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: #selector(managePlayAction))
-        playButton.tintColor = UIColor.white
-        items.append(playButton)
-
-        songToolbarText = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
-        songToolbarText.tintColor = UIColor.white
-        items.append(songToolbarText)
-
-        //setToolbarItems(items, animated: true)
-        //navigationController!.toolbar.setItems(items, animated: true)
-        navigationController!.toolbar.items = items
-        navigationController!.toolbar.barTintColor = UIColor.darkGray
+        toolbarItems = [playButton, songToolbarText, blank]
     }
 
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -134,7 +134,9 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
      * audioPlayerDidFinishPlaying: Cuando la canción ha terminado de reproducirse, se pasa y reproduce la siguiente canción
      */
     func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
-        player.stop()
+        // TODO: Siguiente cancion
+        self.player.stop()
+        // ERROR: Cuando la cancion termina en la lista, se sigue reproduciendo la siguiente
     }
     
     /**
@@ -143,10 +145,10 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
     */
     @objc private func managePlayAction() {
         if isPlaying {
-            playButton?.image = UIImage(systemName: "play.fill")
+            setToolbarButtonsForPlayingSong("play.fill")
             player.pause()
         } else {
-            playButton?.image = UIImage(systemName: "pause.fill")
+            setToolbarButtonsForPlayingSong("pause.fill")
             player.play()
         }
         isPlaying = !isPlaying
@@ -161,12 +163,10 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
         resetUIList()
         
         if view.isPlaying {
-            let cellOfPlayingSong = tableView.cellForRow(at: IndexPath(row: view.actualSongIndex!,
+            cellOfPlayingSong = tableView.cellForRow(at: IndexPath(row: view.actualSongIndex!,
                                                                                   section: 0))
             cellOfPlayingSong?.textLabel?.textColor = UIColor.systemYellow
             cellOfPlayingSong?.detailTextLabel?.textColor = UIColor.systemYellow
-            playButton?.image = UIImage(systemName: "pause.fill")
-            songToolbarText?.title = cellOfPlayingSong!.textLabel!.text! + " - " + cellOfPlayingSong!.detailTextLabel!.text!
             
             self.player = view.player
             self.isPlaying = view.isPlaying
@@ -181,7 +181,7 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
      * Prepara las variables para entrar a la preview de la cancion.
      * Las canciones deben de tener el siguiente formato para su correcto parseo:
      *
-     *      "artista-nombre.mp3"
+     *      "artista - nombre.mp3"
      *
      * @var songRawName: nombre del fichero de la cancion
      * @var actualSongIndex: indice que representa la posicion de la cancion abierta dentro de la lista de las canciones
@@ -193,7 +193,7 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "goToPlaySong" {
             if (segue.destination.view != nil) {
-                if isPlaying { player.pause() }
+                if isPlaying { player.stop() }
                 
                 // TODO: Si song == songPlaying, entrar a la view con los parametros
                 //  del timer puestos con self.player
@@ -225,5 +225,29 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
             cell?.detailTextLabel?.textColor = UIColor.white
             cell?.imageView?.image = UIImage(named: "album")
         }
+    }
+    
+    /**
+     * createCustomButton: Crea un boton personalizado para la UIToolbar
+     */
+    private func createCustomButton(_ image: String?, _ title: String?) -> UIBarButtonItem {
+        let button = UIButton(type: .custom)
+
+        button.layer.cornerRadius = 5
+        button.layer.masksToBounds = true
+        
+        if let img = image {
+            button.setBackgroundImage(UIImage(systemName: img), for: .normal)
+            button.tintColor = UIColor.white
+        }
+        
+        button.setTitle(title, for: .normal)
+        button.setTitleColor(UIColor.white, for: .normal)
+        
+        if title == nil {
+            button.addTarget(self, action: #selector(managePlayAction), for: .touchUpInside)
+        }
+        
+        return UIBarButtonItem.init(customView: button);
     }
 }

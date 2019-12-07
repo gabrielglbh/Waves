@@ -48,7 +48,7 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
         docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
         setupRemoteControls()
         setuUpSongForLockScreen()
-        title = ""
+        title = "Waves"
     }
     
     /**
