@@ -26,6 +26,7 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
     var isRepeatModeActive = false
     var isShuffleModeActive = false
     
+    @IBOutlet var portrait: UIImageView?
     @IBOutlet var songName: UILabel?
     @IBOutlet var songArtist: UILabel?
     @IBOutlet var initialTime: UILabel?
@@ -36,8 +37,6 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
     @IBOutlet var shuffleSongs: UIButton?
     
     @IBOutlet var songDurationSlider: UISlider?
-    
-    @IBOutlet var portrait: UIImageView?
     
     /**
      * viewDidLoad: Se crea la URL para acceder a las canciones y se agranda en altura la progress bar.
@@ -56,14 +55,6 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
      * vista de la aplicación
      */
     override func viewWillAppear(_ animated: Bool) {
-        do {
-            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default,
-                                                            options: [.mixWithOthers, .allowAirPlay])
-            try AVAudioSession.sharedInstance().setActive(true)
-        } catch {
-            print(error)
-        }
-        
         setPlayerToNewSong(songToBePlayed!)
         
         navigationController!.navigationBar.tintColor = UIColor.systemYellow
@@ -74,7 +65,14 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "loadLyrics" {
             if (segue.destination.view != nil) {
-                (segue.destination as! LyricsViewController).nameQuery = songName!.text!
+                let view = (segue.destination as! LyricsViewController)
+                
+                let p = AVPlayerItem(url: songToBePlayed!)
+                if let l = p.asset.lyrics {
+                    view.lyrics?.text = l
+                } else {
+                    view.lyrics?.text = "No se han encontrado lyrics ;("
+                }
             }
         }
     }
@@ -83,78 +81,35 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
         performSegue(withIdentifier: "getPlayedSong", sender: self)
     }
     
-    // Nombre explanatorio
-    @IBAction private func nextSong() { goNextOrPreviousSong(true) }
-    
-    // Nombre explanatorio
-    @IBAction private func previousSong() { goNextOrPreviousSong(false) }
-    
-    /**
-     * Nombre explanatorio: actualiza la IU y la canción en función de la pulsación del boton
-     * de play/pause
-     */
-    @IBAction private func playSong() {
-        if isPlaying {
-            playPauseButton?.setImage(UIImage(systemName: "play.circle.fill"), for: .normal)
-            player.pause()
-            songTime.invalidate()
-        } else {
-            playPauseButton?.setImage(UIImage(systemName: "pause.circle.fill"), for: .normal)
-            player.play()
-            startTimerOfSong()
-        }
-        isPlaying = !isPlaying
-    }
-    
-    /**
-     * playFromSelectedTime: Al desplazar el slider, la canción se reproduce desde donde el usuario deja el slider
-     */
-    @IBAction private func playFromSelectedTime() {
-        player.currentTime = Double(songDurationSlider!.value)
-        initialTime?.text = String(convertDurationToString(duration: Double(songDurationSlider!.value)))
-    }
-    
-    @IBAction private func setRepeatMode() {
-        if isRepeatModeActive {
-            repeatSong?.setImage(UIImage(systemName: "repeat"), for: .normal)
-            repeatSong?.tintColor = .lightGray
-        } else {
-            repeatSong?.setImage(UIImage(systemName: "repeat.1"), for: .normal)
-            repeatSong?.tintColor = .systemYellow
-        }
-        isRepeatModeActive = !isRepeatModeActive
-    }
-    
-    @IBAction private func setShuffleMode() {
-        if isShuffleModeActive {
-            shuffleSongs?.tintColor = .lightGray
-        } else {
-            shuffleSongs?.tintColor = .systemYellow
-        }
-        isShuffleModeActive = !isShuffleModeActive
-    }
-    
-    // Nombre explanatorio
-    private func startTimerOfSong() {
-         songTime = Timer.scheduledTimer(timeInterval: 1, target: self,
-                                         selector: (#selector(DisplaySongController.updateSongTimer)),
-                                         userInfo: nil, repeats: true)
-    }
-    
-    /**
-     * Nombre explanatorio: Actualiza el UILabel inicial de tiempo y la barra de progreso cada segundo
-     * que pasa de la canción
-     */
-    @objc private func updateSongTimer() {
-        songDurationSlider?.value += 1
-        initialTime?.text = convertDurationToString(duration: player.currentTime)
-    }
-    
     /**
      * audioPlayerDidFinishPlaying: Cuando la canción ha terminado de reproducirse, se pasa y reproduce la siguiente canción
      */
     func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
-        goNextOrPreviousSong(true)
+        if flag {
+            goNextOrPreviousSong(true)
+        }
+    }
+    
+    // MARK: Funciones de inicialización de la vista
+    
+    /**
+     * setPlayerToNewSong: Se inicializa la variable player con la nueva canción @param songToBePlayed y se reproduce.
+     * Además, actualiza los UILabel de tiempo y hace reset del Timer de reproducción
+     */
+    private func setPlayerToNewSong(_ songToBePlayed: URL) {
+        player = try! AVAudioPlayer(contentsOf: songToBePlayed)
+        player.delegate = self
+        player.prepareToPlay()
+        player.play()
+        
+        initialTime?.text = "0:00"
+        lastTime?.text = convertDurationToString(duration: player.duration)
+        
+        songDurationSlider?.minimumValue = 0
+        songDurationSlider?.maximumValue = Float(player.duration)
+        songDurationSlider?.value = 0
+    
+        startTimerOfSong()
     }
     
     /**
@@ -210,26 +165,69 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
     }
     
-    /**
-     * setPlayerToNewSong: Se inicializa la variable player con la nueva canción @param songToBePlayed y se reproduce.
-     * Además, actualiza los UILabel de tiempo y hace reset del Timer de reproducción
-     */
-    private func setPlayerToNewSong(_ songToBePlayed: URL) {
-        player = try! AVAudioPlayer(contentsOf: songToBePlayed)
-        player.delegate = self
-        player.prepareToPlay()
-        player.play()
-        
-        initialTime?.text = "0:00"
-        lastTime?.text = convertDurationToString(duration: player.duration)
-        
-        songDurationSlider?.minimumValue = 0
-        songDurationSlider?.maximumValue = Float(player.duration)
-        songDurationSlider?.value = 0
-        
-        portrait?.image = UIImage(named: "album2")
+    // MARK: Funciones para la administración de la reproducción
     
-        startTimerOfSong()
+    /**
+     * Nombre explanatorio: actualiza la IU y la canción en función de la pulsación del boton
+     * de play/pause
+     */
+    @IBAction private func playSong() {
+        if isPlaying {
+            playPauseButton?.setImage(UIImage(systemName: "play.circle.fill"), for: .normal)
+            player.pause()
+            songTime.invalidate()
+        } else {
+            playPauseButton?.setImage(UIImage(systemName: "pause.circle.fill"), for: .normal)
+            player.play()
+            startTimerOfSong()
+        }
+        isPlaying = !isPlaying
+    }
+    
+    /**
+     * playFromSelectedTime: Al desplazar el slider, la canción se reproduce desde donde el usuario deja el slider
+     */
+    @IBAction private func playFromSelectedTime() {
+        player.currentTime = Double(songDurationSlider!.value)
+        initialTime?.text = String(convertDurationToString(duration: Double(songDurationSlider!.value)))
+    }
+    
+    // Nombre explanatorio
+    @IBAction private func setRepeatMode() {
+        if isRepeatModeActive {
+            repeatSong?.setImage(UIImage(systemName: "repeat"), for: .normal)
+            repeatSong?.tintColor = .lightGray
+        } else {
+            repeatSong?.setImage(UIImage(systemName: "repeat.1"), for: .normal)
+            repeatSong?.tintColor = .systemYellow
+        }
+        isRepeatModeActive = !isRepeatModeActive
+    }
+    
+    // Nombre explanatorio
+    @IBAction private func setShuffleMode() {
+        if isShuffleModeActive {
+            shuffleSongs?.tintColor = .lightGray
+        } else {
+            shuffleSongs?.tintColor = .systemYellow
+        }
+        isShuffleModeActive = !isShuffleModeActive
+    }
+    
+    // Nombre explanatorio
+    private func startTimerOfSong() {
+         songTime = Timer.scheduledTimer(timeInterval: 1, target: self,
+                                         selector: (#selector(DisplaySongController.updateSongTimer)),
+                                         userInfo: nil, repeats: true)
+    }
+    
+    /**
+     * Nombre explanatorio: Actualiza el UILabel inicial de tiempo y la barra de progreso cada segundo
+     * que pasa de la canción
+     */
+    @objc private func updateSongTimer() {
+        songDurationSlider?.value += 1
+        initialTime?.text = convertDurationToString(duration: player.currentTime)
     }
     
     /**
@@ -278,19 +276,23 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
                 
                 let next = songs![actualSongIndex!]
                 let newSong = docs.appendingPathComponent(next)
+                songToBePlayed = newSong
                 
                 setPlayerToNewSong(newSong)
+                getAndSetDataFromID3(newSong)
                 
-                let parted = next.components(separatedBy: "- ")
-                let artist = parted[0]
-                let title = parted[1].components(separatedBy: ".mp3")[0]
-                
-                songName?.text = title
                 songName?.font = UIFont.boldSystemFont(ofSize: 23)
-                songArtist?.text = artist
             }
         }
     }
+    
+    // Nombre explanatorio
+    @IBAction private func nextSong() { goNextOrPreviousSong(true) }
+    
+    // Nombre explanatorio
+    @IBAction private func previousSong() { goNextOrPreviousSong(false) }
+    
+    // MARK: Funciones auxiliares
     
     /**
      * convertDurationToString: Convierte la duración de la canción actual a un string formateado tal que mm:ss
@@ -305,4 +307,29 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
     private func secondsToTimeInterval (_ seconds : Int) -> Int {
         return (seconds % 3600) % 60
     }
+    
+    /**
+    * getAndSetDataFromID3: Recoge los metadatos de los archivos .mp3 y popula la vista
+    */
+   private func getAndSetDataFromID3(_ song: URL) {
+       let p = AVPlayerItem(url: song)
+       let metadataList = p.asset.commonMetadata
+       
+       for item in metadataList {
+            switch item.commonKey!.rawValue {
+                case "title":
+                    songName?.text = item.value as? String
+                    break
+                case "artist":
+                    songArtist?.text = item.value as? String
+                    break
+               case "artwork":
+                    // TODO: Si no hay data, poner UIImage(named: "album2")
+                    // portrait?.image = UIImage(named: "album2")
+                    portrait?.image = UIImage(data: item.value as! Data)
+               default:
+                    break
+           }
+       }
+   }
 }
