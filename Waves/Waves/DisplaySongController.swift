@@ -45,8 +45,6 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        setupRemoteControls()
-        setuUpSongForLockScreen()
         title = "Waves"
     }
     
@@ -110,59 +108,6 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
         songDurationSlider?.value = 0
     
         startTimerOfSong()
-    }
-    
-    /**
-     * setupRemoteTransportControls: Crea los manejadores para siguiente, anterior, pausa y play en el lock screen.
-     */
-    private func setupRemoteControls() {
-        let commandCenter = MPRemoteCommandCenter.shared()
-
-        commandCenter.playCommand.addTarget { [unowned self] event in
-            if self.player.rate == 0.0 {
-                self.player.play()
-                return .success
-            }
-            return .commandFailed
-        }
-
-        commandCenter.pauseCommand.addTarget { [unowned self] event in
-            if self.player.rate == 1.0 {
-                self.player.pause()
-                return .success
-            }
-            return .commandFailed
-        }
-        
-        commandCenter.nextTrackCommand.addTarget { [unowned self] event in
-            self.goNextOrPreviousSong(true)
-            return .success
-        }
-        
-        commandCenter.previousTrackCommand.addTarget { [unowned self] event in
-            self.goNextOrPreviousSong(false)
-            return .success
-        }
-    }
-    
-    /**
-     * setUpNowPlaying: Crea los datos a mostrar en la lock screen de la cancion actual
-     */
-    private func setuUpSongForLockScreen() {
-        var nowPlayingInfo = [String : Any]()
-        nowPlayingInfo[MPMediaItemPropertyTitle] = songName!.text! + "-" + songArtist!.text!
-
-        if let image = UIImage(named: "album") {
-            nowPlayingInfo[MPMediaItemPropertyArtwork] =
-                MPMediaItemArtwork(boundsSize: image.size) { size in
-                    return image
-            }
-        }
-        /*nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = player.currentTime
-        nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = player.duration
-        nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = player.rate*/
-
-        MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
     }
     
     // MARK: Funciones para la administración de la reproducción

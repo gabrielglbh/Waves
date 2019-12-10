@@ -68,8 +68,8 @@
 				C03B984123848F4000B8B0D3 /* DisplaySongController.swift */,
 				C02218E42397246A00B86FE4 /* LyricsViewController.swift */,
 				C03B98312384620E00B8B0D3 /* Main.storyboard */,
-				C03B98342384620F00B8B0D3 /* Assets.xcassets */,
 				C03B98362384620F00B8B0D3 /* LaunchScreen.storyboard */,
+				C03B98342384620F00B8B0D3 /* Assets.xcassets */,
 				C03B98392384620F00B8B0D3 /* Info.plist */,
 				C03B982F2384620E00B8B0D3 /* ViewController.swift */,
 			);
