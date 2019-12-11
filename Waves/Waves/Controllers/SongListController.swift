@@ -24,6 +24,10 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
     
     var cellOfPlayingSong: UITableViewCell?
         
+    /**
+     * viewDidLoad: Crea un fichero en UsersDefault para mantener el orden de la lista en caso de que haya cambiado
+     * Obtiene el path a los ficheros de música.
+     */
     override func viewDidLoad() {
         super.viewDidLoad()
         self.navigationItem.rightBarButtonItem = self.editButtonItem
@@ -37,6 +41,12 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
         
         files = try? fm.contentsOfDirectory(atPath: docs.path)
         files!.removeAll { $0 == ".DS_Store" }
+        
+        if UserDefaults.standard.object(forKey: "music") == nil {
+            UserDefaults.standard.set(files!, forKey: "music")
+        } else {
+            files = UserDefaults.standard.object(forKey: "music")! as? [String]
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -68,7 +78,7 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
         
         let song_name = files![indexPath.row]
-        getAndSetDataFromID3(docs.appendingPathComponent(song_name), cell: cell, view: nil)
+        getAndSetDataFromID3(docs.appendingPathComponent(song_name), cell: cell)
         
         cell.textLabel?.font = UIFont.boldSystemFont(ofSize: 18)
 
@@ -87,6 +97,8 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
             } catch { print("Error al eliminar") }
             
             files = try? fm.contentsOfDirectory(atPath: docs.path)
+            UserDefaults.standard.set(files!, forKey: "music")
+            
             tableView.deleteRows(at: [indexPath], with: .fade)
         }
     }
@@ -97,6 +109,7 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
     override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
         let song = files!.remove(at: fromIndexPath.row)
         files!.insert(song, at: to.row)
+        UserDefaults.standard.set(files!, forKey: "music")
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -125,14 +138,7 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
      * audioPlayerDidFinishPlaying: Cuando la canción ha terminado de reproducirse, se pasa y reproduce la siguiente canción
      */
     func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
-        // TODO: Siguiente cancion
-        if flag {
-            player.stop()
-        } else {
-            print("Hola")
-        }
-        // ERROR: Cuando la cancion termina en la lista, se sigue reproduciendo la siguiente.
-        //  Se para el player de esta vista, pero el player de la vista de cancion sigue su curso
+        // TODO: Siguiente/Anterior cancion
     }
     
     /**
@@ -141,6 +147,7 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
      */
     @IBAction func unwindToSongList(_ unwind: UIStoryboardSegue) {
         let view = unwind.source as! DisplaySongController
+        hidesBottomBarWhenPushed = false
         resetUIList()
         
         if view.isPlaying {
@@ -149,38 +156,13 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
             cellOfPlayingSong?.textLabel?.textColor = UIColor.systemYellow
             cellOfPlayingSong?.detailTextLabel?.textColor = UIColor.systemYellow
             
-            self.player = view.player
+            // TODO: Recuperar de algun sitio el player actual, no de la vista
             self.isPlaying = view.isPlaying
             
             navigationController!.isToolbarHidden = false
         } else {
             navigationController!.isToolbarHidden = true
         }
-    }
-    
-    /**
-    * didSelect: Delegado de UITabBar. Actualiza la IU y la canción en función de la pulsación del boton
-    * de play/pause, y siguiente/anterior cancion
-    */
-    @objc private func managePlayAction() {
-        if isPlaying {
-            setToolbarButtonsForPlayingSong("play.fill")
-            player.pause()
-        } else {
-            setToolbarButtonsForPlayingSong("pause.fill")
-            player.play()
-        }
-        isPlaying = !isPlaying
-    }
-    
-    /**
-     * refreshLibrary: Actualiza la biblioteca de música por si se ha añadido alguna canción nueva
-     * mientras la aplicación se está ejecutando
-     */
-    private func refreshLibrary() {
-        files = try? fm.contentsOfDirectory(atPath: docs.path)
-        files!.removeAll { $0 == ".DS_Store" }
-        tableView.reloadData()
     }
 
     /**
@@ -195,14 +177,19 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
      * @var songToBePlayed: URL de la cancion que se debe reproducir
      * @var songName: nombre explanatorio
      * @var songArtist: nombre explanatorio
+     * @hideBottomBarWhenPushed: Esconde la NavBar al ir a la preview de la canción
      */
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "goToPlaySong" {
             if (segue.destination.view != nil) {
-                if isPlaying { player.stop() }
+                if isPlaying {
+                    // TODO: Stop Current Song Playing
+                }
                 
                 // TODO: Si song == songPlaying, entrar a la view con los parametros
                 //  del timer puestos con self.player
+                
+                hidesBottomBarWhenPushed = true
                 
                 let view = segue.destination as! DisplaySongController
                 
@@ -213,56 +200,64 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
                 
                 let songToBePlayed = docs.appendingPathComponent(song)
                 view.songToBePlayed = songToBePlayed
-                
-                getAndSetDataFromID3(songToBePlayed, cell: nil, view: view)
             }
         }
+    }
+    
+    /**
+    * didSelect: Delegado de UITabBar. Actualiza la IU y la canción en función de la pulsación del boton
+    * de play/pause, y siguiente/anterior cancion
+    */
+    @objc private func managePlayAction() {
+        if isPlaying {
+            setToolbarButtonsForPlayingSong("play.fill")
+            // TODO: Parar la reproduccion
+        } else {
+            setToolbarButtonsForPlayingSong("pause.fill")
+            // TODO: Reproducir
+        }
+        isPlaying = !isPlaying
+    }
+    
+    /**
+     * refreshLibrary: Actualiza la biblioteca de música por si se ha añadido alguna canción nueva
+     * mientras la aplicación se está ejecutando
+     */
+    private func refreshLibrary() {
+        files = try? fm.contentsOfDirectory(atPath: docs.path)
+        files!.removeAll { $0 == ".DS_Store" }
+        tableView.reloadData()
     }
     
     // MARK: Funciones Auxiliares
     
     /**
-     * getAndSetDataFromID3: Recoge los metadatos de los archivos .mp3 y popula la lista/vista
+     * getAndSetDataFromID3: Recoge los metadatos de los archivos .mp3 y popula la celda de la lista
      */
-    private func getAndSetDataFromID3(_ song: URL, cell: UITableViewCell?, view: DisplaySongController?) {
+    private func getAndSetDataFromID3(_ song: URL, cell: UITableViewCell?) {
         let p = AVPlayerItem(url: song)
         let metadataList = p.asset.commonMetadata
+        var count = 1
         
         for item in metadataList {
             switch item.commonKey!.rawValue {
                 case "title":
-                    if cell != nil {
-                        cell!.textLabel?.text = item.value as? String
-                    } else {
-                        view!.songName?.text = item.value as? String
-                    }
+                    cell!.textLabel?.text = item.value as? String
                     break
                 case "artist":
-                    if cell != nil {
-                        cell!.detailTextLabel?.text = item.value as? String
-                    } else {
-                        view!.songArtist?.text = item.value as? String
-                    }
+                    cell!.detailTextLabel?.text = item.value as? String
                     break
                 case "artwork":
-                    print(item.value as! Data)
-                        if cell != nil {
-                            cell!.imageView?.image = UIImage(data: item.value as! Data)
-                        } else {
-                            view!.portrait?.image = UIImage(data: item.value as! Data)!
-                        }
-                    /*
-                    
-                    TODO: Si no hay imagen de album
-                 
-                    if cell != nil {
-                       cell!.imageView?.image = UIImage(named: "album")
-                    } else {
-                       view!.portrait?.image = UIImage(named: "album2")
-                    }*/
+                    count -= 1
+                    cell!.imageView?.image = UIImage(data: item.value as! Data)
+                    break
                 default:
                     break
             }
+        }
+        
+        if count != 0 {
+            cell!.imageView?.image = UIImage(named: "album")
         }
     }
     

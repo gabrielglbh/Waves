@@ -12,7 +12,6 @@ import MediaPlayer
 
 class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
 
-    // Variables para la reproducción de la cancion
     var player: AVAudioPlayer!
     var songToBePlayed: URL?
     var docs: URL!
@@ -53,7 +52,8 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
      * vista de la aplicación
      */
     override func viewWillAppear(_ animated: Bool) {
-        setPlayerToNewSong(songToBePlayed!)
+        getAndSetDataFromID3(songToBePlayed!)
+        setPlayerToNewSong(songToBePlayed!, isOnPause: false)
         
         navigationController!.navigationBar.tintColor = UIColor.systemYellow
         navigationController!.navigationBar.barTintColor = UIColor.darkGray
@@ -84,7 +84,7 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
      */
     func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
         if flag {
-            goNextOrPreviousSong(true)
+            goNextOrPreviousSong(true, hasEnded: true)
         }
     }
     
@@ -92,13 +92,23 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
     
     /**
      * setPlayerToNewSong: Se inicializa la variable player con la nueva canción @param songToBePlayed y se reproduce.
-     * Además, actualiza los UILabel de tiempo y hace reset del Timer de reproducción
+     * Además, actualiza los UILabel de tiempo y hace reset del Timer de reproducción.
+     * El @param isOnPause sirve para clarificar si empezar o no la reproduccion al cambiar de cancion.
      */
-    private func setPlayerToNewSong(_ songToBePlayed: URL) {
+    private func setPlayerToNewSong(_ songToBePlayed: URL, isOnPause: Bool) {
+        do {
+            try AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.playback)
+            try AVAudioSession.sharedInstance().setActive(true)
+        } catch _ {}
+        UIApplication.shared.beginReceivingRemoteControlEvents()
+        
         player = try! AVAudioPlayer(contentsOf: songToBePlayed)
         player.delegate = self
-        player.prepareToPlay()
-        player.play()
+        
+        if !isOnPause {
+            player.prepareToPlay()
+            player.play()
+        }
         
         initialTime?.text = "0:00"
         lastTime?.text = convertDurationToString(duration: player.duration)
@@ -107,7 +117,28 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
         songDurationSlider?.maximumValue = Float(player.duration)
         songDurationSlider?.value = 0
     
-        startTimerOfSong()
+        if !isOnPause { startTimerOfSong() }
+    }
+    
+    /**
+     * remoteControlReceived: Funcion para posible control remoto con cascos o demás para la reproducción
+     * de la canción
+     */
+    override func remoteControlReceived(with event: UIEvent?) {
+        if event!.type == UIEvent.EventType.remoteControl{
+            switch event!.subtype{
+                case UIEventSubtype.remoteControlPlay:
+                    playSong()
+                case UIEventSubtype.remoteControlPause:
+                    playSong()
+                case UIEventSubtype.remoteControlNextTrack:
+                    goNextOrPreviousSong(true, hasEnded: false)
+                case UIEventSubtype.remoteControlPreviousTrack:
+                    goNextOrPreviousSong(false, hasEnded: false)
+                default:
+                    print("Error con el control remoto")
+            }
+        }
     }
     
     // MARK: Funciones para la administración de la reproducción
@@ -180,6 +211,9 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
      *      True -> Siguiente cancion
      *      False -> Anterior cancion
      *
+     * Por supuesto se verifica si al pasar de canción, en el modo que sea, si la canción está reproduciendose o no, ya que
+     * el reproductor se comporta de manera diferente.
+     *
      * Se añade la funcionalidad de que si la canción ha sido reproducida más de 5 segundos, al darle a "anterior cancion",
      * se reproduce de nuevo la canción actual. Si no, se reproduce la canción anterior.
      *
@@ -188,21 +222,32 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
      *
      * Se maneja aquí la funcionalidad del aleatorio.
      */
-    private func goNextOrPreviousSong(_ mode: Bool) {
+    private func goNextOrPreviousSong(_ mode: Bool, hasEnded: Bool) {
         songTime.invalidate()
         songDurationSlider?.value = 0
         
         if isRepeatModeActive {
-            player.currentTime = 0
-            initialTime?.text = "0:00"
-            startTimerOfSong()
-            player.play()
-        } else {
-            let limitFromSkippingSong = secondsToTimeInterval(5)
-            if !mode && Int(player.currentTime) > limitFromSkippingSong {
+            if player.isPlaying {
                 player.currentTime = 0
                 initialTime?.text = "0:00"
                 startTimerOfSong()
+                player.prepareToPlay()
+                player.play()
+            } else {
+                player.currentTime = 0
+                initialTime?.text = "0:00"
+            }
+        } else {
+            let limitFromSkippingSong = secondsToTimeInterval(5)
+            if !mode && Int(player.currentTime) > limitFromSkippingSong {
+                if player.isPlaying {
+                    player.currentTime = 0
+                    initialTime?.text = "0:00"
+                    startTimerOfSong()
+                } else {
+                    player.currentTime = 0
+                    initialTime?.text = "0:00"
+                }
             } else {
                 if isShuffleModeActive { actualSongIndex = Int.random(in: 0 ..< songs!.count) }
                 else {
@@ -223,7 +268,11 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
                 let newSong = docs.appendingPathComponent(next)
                 songToBePlayed = newSong
                 
-                setPlayerToNewSong(newSong)
+                if hasEnded {
+                    setPlayerToNewSong(newSong, isOnPause: false)
+                } else {
+                    setPlayerToNewSong(newSong, isOnPause: !player.isPlaying)
+                }
                 getAndSetDataFromID3(newSong)
                 
                 songName?.font = UIFont.boldSystemFont(ofSize: 23)
@@ -232,10 +281,10 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
     }
     
     // Nombre explanatorio
-    @IBAction private func nextSong() { goNextOrPreviousSong(true) }
+    @IBAction private func nextSong() { goNextOrPreviousSong(true, hasEnded: false) }
     
     // Nombre explanatorio
-    @IBAction private func previousSong() { goNextOrPreviousSong(false) }
+    @IBAction private func previousSong() { goNextOrPreviousSong(false, hasEnded: false) }
     
     // MARK: Funciones auxiliares
     
@@ -254,13 +303,14 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
     }
     
     /**
-    * getAndSetDataFromID3: Recoge los metadatos de los archivos .mp3 y popula la vista
-    */
-   private func getAndSetDataFromID3(_ song: URL) {
-       let p = AVPlayerItem(url: song)
-       let metadataList = p.asset.commonMetadata
-       
-       for item in metadataList {
+     * getAndSetDataFromID3: Recoge los metadatos de los archivos .mp3 y popula la vista
+     */
+    private func getAndSetDataFromID3(_ song: URL) {
+        let p = AVPlayerItem(url: song)
+        let metadataList = p.asset.commonMetadata
+        var count = 1
+   
+        for item in metadataList {
             switch item.commonKey!.rawValue {
                 case "title":
                     songName?.text = item.value as? String
@@ -268,13 +318,17 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
                 case "artist":
                     songArtist?.text = item.value as? String
                     break
-               case "artwork":
-                    // TODO: Si no hay data, poner UIImage(named: "album2")
-                    // portrait?.image = UIImage(named: "album2")
+                case "artwork":
+                    count -= 1
                     portrait?.image = UIImage(data: item.value as! Data)
-               default:
                     break
-           }
-       }
-   }
+                default:
+                    break
+            }
+        }
+        
+        if count != 0 {
+            portrait?.image = UIImage(named: "album")
+        }
+    }
 }
