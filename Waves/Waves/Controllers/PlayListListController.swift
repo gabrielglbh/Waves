@@ -9,6 +9,8 @@
 import UIKit
 
 class PlayListListController: UITableViewController {
+    
+    var playlists = [String]()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -16,6 +18,12 @@ class PlayListListController: UITableViewController {
         self.editButtonItem.tintColor = UIColor.systemYellow
         
         title = "Mis Listas"
+        
+        if UserDefaults.standard.object(forKey: "playlists") == nil {
+            UserDefaults.standard.set(playlists, forKey: "playlists")
+        } else {
+            playlists = (UserDefaults.standard.object(forKey: "playlists")! as? [String])!
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -31,13 +39,13 @@ class PlayListListController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 9 // TODO:
+        return playlists.count
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "CellPlaylist", for: indexPath)
 
-        // TODO:
+        cell.textLabel?.text = playlists[indexPath.row]
         cell.textLabel?.font = UIFont.boldSystemFont(ofSize: 18)
         cell.textLabel?.textColor = UIColor.white
         
@@ -46,12 +54,16 @@ class PlayListListController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            // TODO:
+            playlists.remove(at: indexPath.row)
+            UserDefaults.standard.set(playlists, forKey: "playlists")
+            tableView.deleteRows(at: [indexPath], with: .fade)
         }
     }
     
     override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-        // TODO:
+        let playlist = playlists.remove(at: fromIndexPath.row)
+        playlists.insert(playlist, at: to.row)
+        UserDefaults.standard.set(playlists, forKey: "music")
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -75,11 +87,45 @@ class PlayListListController: UITableViewController {
     }
     
     @IBAction private func addPlaylist() {
-        // TODO:
+        let alert = UIAlertController(title: "Añadir Playlist", message: nil, preferredStyle: .alert)
+        
+        alert.addTextField(configurationHandler: {
+            textField in
+            textField.isSecureTextEntry = false
+            textField.placeholder = "Nombre"
+        })
+        
+        let add = UIAlertAction(title: "Ok", style: .default, handler: {
+            action in
+            let playlist = alert.textFields![0].text!
+            if playlist != "" {
+                self.playlists.insert(playlist, at: 0)
+                
+                UserDefaults.standard.set(self.playlists, forKey: "playlists")
+                self.tableView.reloadData()
+            }
+        })
+        
+        let dismiss = UIAlertAction(title: "Atrás", style: .default, handler: {
+            action in
+            self.dismiss(animated: true, completion: nil)
+        })
+        
+        alert.addAction(dismiss)
+        alert.addAction(add)
+        present(alert, animated: true)
     }
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        
+        if segue.identifier == "getPlaylist" {
+            if (segue.destination.view != nil) {
+                let view = segue.destination as! DisplayPlaylistController
+                view.title = playlists[tableView.indexPathForSelectedRow!.row]
+            }
+        }
     }
+    
+    // TODO: Poner reconocimiento de Gesture longPressed para cambiar el nombre de la playlist
+    // TODO: Cambiar el tintColor de los botones en alert
 
 }
