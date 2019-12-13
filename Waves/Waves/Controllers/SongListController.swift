@@ -14,10 +14,13 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
     var docs: URL!
     var files: [String]?
     var fm: FileManager!
-    
-    var player: AVAudioPlayer!
+	
+    // Instancia única para toda la aplicación de la canción que suena
+	let ap = AudioPlayer()
+	var audioPlayer: AudioPlayer!
+	var actualSongIndex: Int?
+	
     var isPlaying = false
-    var currentSongPlaying: UITableViewCell?
     
     var playButton: UIBarButtonItem!
     var songToolbarText: UIBarButtonItem!
@@ -50,6 +53,8 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
     }
     
     override func viewWillAppear(_ animated: Bool) {
+		audioPlayer = ap.getInstance()
+	
         navigationController!.navigationBar.titleTextAttributes =
             [NSAttributedString.Key.foregroundColor: UIColor.systemYellow]
         navigationController!.navigationBar.barTintColor = UIColor.darkGray
@@ -138,7 +143,17 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
      * audioPlayerDidFinishPlaying: Cuando la canción ha terminado de reproducirse, se pasa y reproduce la siguiente canción
      */
     func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
-        // TODO: Siguiente/Anterior cancion
+        actualSongIndex? = audioPlayer.nextSong(currentIndex: actualSongIndex!, hasShuffle: false, totalSongs: files!.count)
+		
+		let next = files![actualSongIndex!]
+		let newSong = docs.appendingPathComponent(next)
+		
+		audioPlayer.setSong(newSong)
+        audioPlayer.setPlay()
+		audioPlayer.prepareToPlay()
+		audioPlayer.play()
+		
+		setCurrentSongUI()
     }
     
     /**
@@ -151,15 +166,11 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
         resetUIList()
         
         if view.isPlaying {
-            cellOfPlayingSong = tableView.cellForRow(at: IndexPath(row: view.actualSongIndex!,
-                                                                                  section: 0))
-            cellOfPlayingSong?.textLabel?.textColor = UIColor.systemYellow
-            cellOfPlayingSong?.detailTextLabel?.textColor = UIColor.systemYellow
-            
-            // TODO: Recuperar de algun sitio el player actual, no de la vista
-            self.isPlaying = view.isPlaying
-            
+			self.actualSongIndex = view.actualSongIndex!
+			self.isPlaying = view.isPlaying
             navigationController!.isToolbarHidden = false
+			
+			setCurrentSongUI()
         } else {
             navigationController!.isToolbarHidden = true
         }
@@ -211,10 +222,10 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
     @objc private func managePlayAction() {
         if isPlaying {
             setToolbarButtonsForPlayingSong("play.fill")
-            // TODO: Parar la reproduccion
+            audioPlayer.pause()
         } else {
             setToolbarButtonsForPlayingSong("pause.fill")
-            // TODO: Reproducir
+            audioPlayer.play()
         }
         isPlaying = !isPlaying
     }
@@ -260,6 +271,12 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
             cell!.imageView?.image = UIImage(named: "album")
         }
     }
+	
+	private func setCurrentSongUI() {
+		cellOfPlayingSong = tableView.cellForRow(at: IndexPath(row: actualSongIndex, section: 0))
+		cellOfPlayingSong?.textLabel?.textColor = UIColor.systemYellow
+		cellOfPlayingSong?.detailTextLabel?.textColor = UIColor.systemYellow
+	}
     
     private func resetUIList() {
         for song in 0...files!.count {

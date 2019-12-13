@@ -12,13 +12,15 @@ import MediaPlayer
 
 class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
 
-    var player: AVAudioPlayer!
     var songToBePlayed: URL?
     var docs: URL!
     var songs: [String]?
     var songRawName: String?
     var actualSongIndex: Int?
     
+	// Instancia única para toda la aplicación de la canción que suena
+	let ap = AudioPlayer()
+	var audioPlayer: AudioPlayer!
     var songTime = Timer()
     
     var isPlaying = true
@@ -52,7 +54,9 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
      * vista de la aplicación
      */
     override func viewWillAppear(_ animated: Bool) {
-        getAndSetDataFromID3(songToBePlayed!)
+		audioPlayer = ap.getInstance()
+	
+		getAndSetDataFromID3(songToBePlayed!)
         setPlayerToNewSong(songToBePlayed!, isOnPause: false)
         
         navigationController!.navigationBar.tintColor = UIColor.systemYellow
@@ -78,16 +82,7 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
     @IBAction func goBackToList(_ sender: Any) {
         performSegue(withIdentifier: "getPlayedSong", sender: self)
     }
-    
-    /**
-     * audioPlayerDidFinishPlaying: Cuando la canción ha terminado de reproducirse, se pasa y reproduce la siguiente canción
-     */
-    func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
-        if flag {
-            goNextOrPreviousSong(true, hasEnded: true)
-        }
-    }
-    
+   
     // MARK: Funciones de inicialización de la vista
     
     /**
@@ -96,19 +91,8 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
      * El @param isOnPause sirve para clarificar si empezar o no la reproduccion al cambiar de cancion.
      */
     private func setPlayerToNewSong(_ songToBePlayed: URL, isOnPause: Bool) {
-        do {
-            try AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.playback)
-            try AVAudioSession.sharedInstance().setActive(true)
-        } catch _ {}
-        UIApplication.shared.beginReceivingRemoteControlEvents()
-        
-        player = try! AVAudioPlayer(contentsOf: songToBePlayed)
-        player.delegate = self
-        
-        if !isOnPause {
-            player.prepareToPlay()
-            player.play()
-        }
+		audioPlayer.setSong(songToBePlayed)
+        audioPlayer.setPlay()
         
         initialTime?.text = "0:00"
         lastTime?.text = convertDurationToString(duration: player.duration)
@@ -117,7 +101,17 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
         songDurationSlider?.maximumValue = Float(player.duration)
         songDurationSlider?.value = 0
     
-        if !isOnPause { startTimerOfSong() }
+        if !isOnPause { 
+			audioPlayer.prepareToPlay()
+            audioPlayer.play()
+			startTimerOfSong() 
+		}
+    }
+	
+	func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
+        if flag {
+            goNextOrPreviousSong(true, hasEnded: true)
+        }
     }
     
     /**
@@ -150,11 +144,11 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
     @IBAction private func playSong() {
         if isPlaying {
             playPauseButton?.setImage(UIImage(systemName: "play.circle.fill"), for: .normal)
-            player.pause()
+            audioPlayer.pause()
             songTime.invalidate()
         } else {
             playPauseButton?.setImage(UIImage(systemName: "pause.circle.fill"), for: .normal)
-            player.play()
+            audioPlayer.play()
             startTimerOfSong()
         }
         isPlaying = !isPlaying
@@ -164,7 +158,7 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
      * playFromSelectedTime: Al desplazar el slider, la canción se reproduce desde donde el usuario deja el slider
      */
     @IBAction private func playFromSelectedTime() {
-        player.currentTime = Double(songDurationSlider!.value)
+        audioPlayer.setCurrentTime(at: Double(songDurationSlider!.value))
         initialTime?.text = String(convertDurationToString(duration: Double(songDurationSlider!.value)))
     }
     
@@ -227,41 +221,28 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
         songDurationSlider?.value = 0
         
         if isRepeatModeActive {
-            if player.isPlaying {
-                player.currentTime = 0
+            if audioPlayer.evaluateOnRepeat() {
                 initialTime?.text = "0:00"
                 startTimerOfSong()
-                player.prepareToPlay()
-                player.play()
             } else {
-                player.currentTime = 0
                 initialTime?.text = "0:00"
             }
         } else {
             let limitFromSkippingSong = secondsToTimeInterval(5)
-            if !mode && Int(player.currentTime) > limitFromSkippingSong {
-                if player.isPlaying {
-                    player.currentTime = 0
+            if !mode && Int(audioPlayer.getCurrentTime) > limitFromSkippingSong {
+                if audioPlayer.getIsPlaying {
+                    audioPlayer.setCurrentTime(at: 0)
                     initialTime?.text = "0:00"
                     startTimerOfSong()
                 } else {
-                    player.currentTime = 0
+                    audioPlayer.setCurrentTime(at: 0)
                     initialTime?.text = "0:00"
                 }
             } else {
-                if isShuffleModeActive { actualSongIndex = Int.random(in: 0 ..< songs!.count) }
-                else {
-                    if mode {
-                        actualSongIndex? += 1
-                        if actualSongIndex == songs!.count {
-                            actualSongIndex = 0
-                        }
-                    } else {
-                        actualSongIndex? -= 1
-                        if actualSongIndex == -1 {
-                            actualSongIndex = songs!.count - 1
-                        }
-                    }
+				if mode {
+					actualSongIndex? = audioPlayer.nextSong(currentIndex: actualSongIndex!, hasShuffle: isShuffleModeActive, totalSongs: songs!.count)
+				} else {
+					actualSongIndex? = audioPlayer.prevSong(currentIndex: actualSongIndex!, hasShuffle: isShuffleModeActive, totalSongs: songs!.count)
                 }
                 
                 let next = songs![actualSongIndex!]
