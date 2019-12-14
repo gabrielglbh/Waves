@@ -63,6 +63,9 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
         navigationController!.navigationBar.tintColor = UIColor.systemYellow
         navigationController!.navigationBar.barTintColor = UIColor.darkGray
         navigationController!.isToolbarHidden = true
+        
+        setRepeatMode()
+        setShuffleMode()
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {

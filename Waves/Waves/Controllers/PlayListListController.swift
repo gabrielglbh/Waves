@@ -11,6 +11,10 @@ import UIKit
 class PlayListListController: UITableViewController {
     
     var playlists = [String]()
+    var modification = false
+    
+    var alertIndex: Int!
+    var alertText: String!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -42,12 +46,19 @@ class PlayListListController: UITableViewController {
         return playlists.count
     }
 
+    /**
+     * Se añade un gestureRecognizer a cada celda para poder modificar su nombre
+     */
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "CellPlaylist", for: indexPath)
 
         cell.textLabel?.text = playlists[indexPath.row]
         cell.textLabel?.font = UIFont.boldSystemFont(ofSize: 18)
         cell.textLabel?.textColor = UIColor.white
+        
+        let longPress = UILongPressGestureRecognizer(target: self, action: #selector(modifyPlaylist))
+        longPress.minimumPressDuration = 1
+        cell.addGestureRecognizer(longPress)
         
         return cell
     }
@@ -63,10 +74,13 @@ class PlayListListController: UITableViewController {
     override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
         let playlist = playlists.remove(at: fromIndexPath.row)
         playlists.insert(playlist, at: to.row)
-        UserDefaults.standard.set(playlists, forKey: "music")
+        UserDefaults.standard.set(playlists, forKey: "playlists")
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        alertIndex = tableView.indexPathForSelectedRow!.row
+        let cell = tableView.cellForRow(at: indexPath)
+        alertText = cell?.textLabel?.text
         tableView.deselectRow(at: indexPath, animated: true)
     }
    
@@ -86,11 +100,17 @@ class PlayListListController: UITableViewController {
         return .delete
     }
     
+    @objc private func modifyPlaylist() {
+        modification = true
+        addPlaylist()
+    }
+    
     @IBAction private func addPlaylist() {
         let alert = UIAlertController(title: "Añadir Playlist", message: nil, preferredStyle: .alert)
         
         alert.addTextField(configurationHandler: {
             textField in
+            if self.modification { textField.text = self.alertText }
             textField.isSecureTextEntry = false
             textField.placeholder = "Nombre"
         })
@@ -99,8 +119,14 @@ class PlayListListController: UITableViewController {
             action in
             let playlist = alert.textFields![0].text!
             if playlist != "" {
-                self.playlists.insert(playlist, at: 0)
+                if self.modification {
+                    self.playlists.remove(at: self.alertIndex)
+                    self.playlists.insert(playlist, at: self.alertIndex)
+                } else {
+                    self.playlists.insert(playlist, at: 0)
+                }
                 
+                self.modification = false
                 UserDefaults.standard.set(self.playlists, forKey: "playlists")
                 self.tableView.reloadData()
             }
@@ -108,11 +134,13 @@ class PlayListListController: UITableViewController {
         
         let dismiss = UIAlertAction(title: "Atrás", style: .default, handler: {
             action in
+            self.modification = false
             self.dismiss(animated: true, completion: nil)
         })
         
         alert.addAction(dismiss)
         alert.addAction(add)
+        alert.view.tintColor = UIColor.darkGray
         present(alert, animated: true)
     }
 
@@ -124,8 +152,4 @@ class PlayListListController: UITableViewController {
             }
         }
     }
-    
-    // TODO: Poner reconocimiento de Gesture longPressed para cambiar el nombre de la playlist
-    // TODO: Cambiar el tintColor de los botones en alert
-
 }

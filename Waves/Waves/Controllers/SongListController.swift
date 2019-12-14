@@ -20,6 +20,8 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
 	var audioPlayer: AudioPlayer!
     
 	var actualSongIndex: Int?
+    var isShuffleModeActive = false
+    var isRepeatModeActive = false
     var isPlaying = false
     var fromToolbarToDisplay = false
     
@@ -166,6 +168,8 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
         
         if view.isPlaying {
 			self.actualSongIndex = view.actualSongIndex!
+            self.isShuffleModeActive = view.isShuffleModeActive
+            self.isRepeatModeActive = view.isRepeatModeActive
 			self.isPlaying = view.isPlaying
             navigationController!.isToolbarHidden = false
 			
@@ -180,10 +184,7 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
      * Prepara las variables para entrar a la preview de la cancion.
      * @var songRawName: nombre del fichero de la cancion
      * @var actualSongIndex: indice que representa la posicion de la cancion abierta dentro de la lista de las canciones
-     * @var songs: lista de canciones
      * @var songToBePlayed: URL de la cancion que se debe reproducir
-     * @var songName: nombre explanatorio
-     * @var songArtist: nombre explanatorio
      * @hideBottomBarWhenPushed: Esconde la NavBar al ir a la preview de la canción
      */
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -213,6 +214,9 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
                 
                 let songToBePlayed = docs.appendingPathComponent(song)
                 view.songToBePlayed = songToBePlayed
+                
+                view.isShuffleModeActive = !self.isShuffleModeActive
+                view.isRepeatModeActive = !self.isRepeatModeActive
             }
         }
     }
@@ -235,22 +239,23 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
     }
     
     private func goNextOrPreviousSong(mode: Bool, isOnPause: Bool) {
-        let prev = actualSongIndex!
-        if mode {
-            actualSongIndex = audioPlayer.nextSong(currentIndex: prev,
-                                                    hasShuffle: false,
-                                                    totalSongs: files!.count)
-        } else {
-            actualSongIndex = audioPlayer.prevSong(currentIndex: prev,
-                                                    hasShuffle: false,
-                                                    totalSongs: files!.count)
+        if !isRepeatModeActive {
+            let prev = actualSongIndex!
+            if mode {
+                actualSongIndex = audioPlayer.nextSong(currentIndex: prev,
+                                                        hasShuffle: isShuffleModeActive,
+                                                        totalSongs: files!.count)
+            } else {
+                actualSongIndex = audioPlayer.prevSong(currentIndex: prev,
+                                                        hasShuffle: isShuffleModeActive,
+                                                        totalSongs: files!.count)
+            }
+            resetUIList()
+            setCurrentSongUI()
         }
         
         let next = files![actualSongIndex!]
         let newSong = docs.appendingPathComponent(next)
-        
-        resetUIList()
-        setCurrentSongUI()
         
         audioPlayer.setSong(song: newSong)
         audioPlayer.setDelegate(sender: self)

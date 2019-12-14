@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		C02218E52397246A00B86FE4 /* LyricsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C02218E42397246A00B86FE4 /* LyricsViewController.swift */; };
+		C02600EA23A54469004F6054 /* ToolbarPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C02600E923A54469004F6054 /* ToolbarPlayer.swift */; };
 		C03B982C2384620E00B8B0D3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C03B982B2384620E00B8B0D3 /* AppDelegate.swift */; };
 		C03B982E2384620E00B8B0D3 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C03B982D2384620E00B8B0D3 /* SceneDelegate.swift */; };
 		C03B98302384620E00B8B0D3 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C03B982F2384620E00B8B0D3 /* ViewController.swift */; };
@@ -23,6 +24,7 @@
 
 /* Begin PBXFileReference section */
 		C02218E42397246A00B86FE4 /* LyricsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LyricsViewController.swift; sourceTree = "<group>"; };
+		C02600E923A54469004F6054 /* ToolbarPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarPlayer.swift; sourceTree = "<group>"; };
 		C03B98282384620E00B8B0D3 /* Waves.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Waves.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C03B982B2384620E00B8B0D3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C03B982D2384620E00B8B0D3 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -84,6 +86,7 @@
 			isa = PBXGroup;
 			children = (
 				C0CE181B23A28917000118D4 /* AudioPlayer.swift */,
+				C02600E923A54469004F6054 /* ToolbarPlayer.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -186,6 +189,7 @@
 				C03B98302384620E00B8B0D3 /* ViewController.swift in Sources */,
 				C03B982C2384620E00B8B0D3 /* AppDelegate.swift in Sources */,
 				C03B984223848F4000B8B0D3 /* DisplaySongController.swift in Sources */,
+				C02600EA23A54469004F6054 /* ToolbarPlayer.swift in Sources */,
 				C03B98402384624A00B8B0D3 /* SongListController.swift in Sources */,
 				C0CE181A23A2852B000118D4 /* DisplayPlaylistController.swift in Sources */,
 				C03B982E2384620E00B8B0D3 /* SceneDelegate.swift in Sources */,

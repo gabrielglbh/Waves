@@ -218,7 +218,7 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
                 <exit id="Fit-rK-7TL" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
-            <point key="canvasLocation" x="2114" y="1057"/>
+            <point key="canvasLocation" x="2112" y="1057"/>
         </scene>
         <!--Lyrics View Controller-->
         <scene sceneID="wYp-wk-t8J">
@@ -406,12 +406,54 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
                                     <color key="titleColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </state>
                             </button>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="eZy-Mc-1Fc">
+                                <rect key="frame" x="0.0" y="202" width="414" height="611"/>
+                                <color key="backgroundColor" cocoaTouchSystemColor="scrollViewTexturedBackgroundColor"/>
+                                <prototypes>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="V7X-aX-RuP" detailTextLabel="OTl-5J-xXQ" imageView="1B3-ac-4CD" rowHeight="70" style="IBUITableViewCellStyleSubtitle" id="V9w-hb-Omo">
+                                        <rect key="frame" x="0.0" y="28" width="414" height="70"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="V9w-hb-Omo" id="03t-lM-gTR">
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="70"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="V7X-aX-RuP">
+                                                    <rect key="frame" x="105" y="15" width="33.5" height="20.5"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Subtitle" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="OTl-5J-xXQ">
+                                                    <rect key="frame" x="105" y="38.5" width="44" height="14.5"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                                    <color key="textColor" name="Detail"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <imageView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" image="album" id="1B3-ac-4CD">
+                                                    <rect key="frame" x="20" y="0.0" width="70" height="70"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                </imageView>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                        <color key="backgroundColor" cocoaTouchSystemColor="scrollViewTexturedBackgroundColor"/>
+                                        <connections>
+                                            <segue destination="BYZ-38-t0r" kind="show" id="SmI-vE-uLJ"/>
+                                        </connections>
+                                    </tableViewCell>
+                                </prototypes>
+                            </tableView>
                         </subviews>
                         <color key="backgroundColor" cocoaTouchSystemColor="scrollViewTexturedBackgroundColor"/>
                         <color key="tintColor" systemColor="systemYellowColor" red="1" green="0.80000000000000004" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="2G8-5E-7iI" firstAttribute="centerX" secondItem="yR2-nX-k1k" secondAttribute="centerX" id="BLh-qg-eQr"/>
                             <constraint firstItem="2G8-5E-7iI" firstAttribute="centerY" secondItem="yR2-nX-k1k" secondAttribute="centerY" constant="-300" id="Chj-ib-UhK"/>
+                            <constraint firstItem="eZy-Mc-1Fc" firstAttribute="leading" secondItem="hHO-w8-eSz" secondAttribute="leading" id="KyX-J8-Qfk"/>
+                            <constraint firstItem="eZy-Mc-1Fc" firstAttribute="trailing" secondItem="hHO-w8-eSz" secondAttribute="trailing" id="ZdD-Hr-bYq"/>
+                            <constraint firstItem="hHO-w8-eSz" firstAttribute="bottom" secondItem="eZy-Mc-1Fc" secondAttribute="bottom" id="v16-Zw-BeB"/>
+                            <constraint firstItem="eZy-Mc-1Fc" firstAttribute="top" secondItem="2G8-5E-7iI" secondAttribute="bottom" constant="25" id="xgB-0f-iel"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="hHO-w8-eSz"/>
                     </view>
@@ -497,4 +539,7 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
             <color red="0.91590370735308468" green="0.91147905176200705" blue="0.92032836294416243" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
         </namedColor>
     </resources>
+    <inferredMetricsTieBreakers>
+        <segue reference="bYj-br-k7k"/>
+    </inferredMetricsTieBreakers>
 </document>
