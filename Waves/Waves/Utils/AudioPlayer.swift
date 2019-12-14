@@ -10,20 +10,25 @@ import UIKit
 import AVFoundation
 import MediaPlayer
 
+// MARK: Instancia SINGLETON para que el reproductor sea accesible en toda la aplicación
+
 class AudioPlayer: NSObject {
 
 	static var sharedInstance = AudioPlayer()
 	private var player: AVAudioPlayer!
 	
 	func getInstance() -> AudioPlayer {
-		return sharedInstance
+        return AudioPlayer.sharedInstance
 	}
 	
 	func setSong(song: URL) {
-		player = try! AVAudioPlayer(contentsOf: songToBePlayed)
-        player.delegate = self
+		player = try! AVAudioPlayer(contentsOf: song)
 	}
 	
+    func setDelegate(sender: AVAudioPlayerDelegate) {
+        self.player.delegate = sender
+    }
+    
 	func setPlay() {
 		do {
             try AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.playback)
@@ -43,32 +48,38 @@ class AudioPlayer: NSObject {
 	func pause() {
 		self.player.pause()
 	}
+    
+    func stop() {
+        self.player.stop()
+    }
 	
 	func nextSong(currentIndex: Int, hasShuffle: Bool, totalSongs: Int) -> Int {
+        var ind = currentIndex
 		if hasShuffle { 
 			return Int.random(in: 0 ..< totalSongs) 
 		} else {
-			currentIndex += 1
-			if currentIndex == totalSongs {
-				currentIndex = 0
+			ind += 1
+			if ind == totalSongs {
+				ind = 0
 			}
-			return currentIndex
+			return ind
 		}
 	}
 	
 	func prevSong(currentIndex: Int, hasShuffle: Bool, totalSongs: Int) -> Int {
+        var ind = currentIndex
 		if hasShuffle { 
 			return Int.random(in: 0 ..< totalSongs) 
 		} else {
-			currentIndex? -= 1
-			if currentIndex == -1 {
-				currentIndex = totalSongs - 1
+			ind -= 1
+			if ind == -1 {
+				ind = totalSongs - 1
 			}
-			return currentIndex
+			return ind
 		}
 	}
 	
-	func getCurrentTime() -> Double() {
+	func getCurrentTime() -> Double {
 		return self.player.currentTime
 	}
 	

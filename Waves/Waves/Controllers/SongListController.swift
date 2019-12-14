@@ -18,13 +18,13 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
     // Instancia única para toda la aplicación de la canción que suena
 	let ap = AudioPlayer()
 	var audioPlayer: AudioPlayer!
+    
 	var actualSongIndex: Int?
-	
     var isPlaying = false
+    var fromToolbarToDisplay = false
     
     var playButton: UIBarButtonItem!
     var songToolbarText: UIBarButtonItem!
-    
     var cellOfPlayingSong: UITableViewCell?
         
     /**
@@ -59,11 +59,11 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
             [NSAttributedString.Key.foregroundColor: UIColor.systemYellow]
         navigationController!.navigationBar.barTintColor = UIColor.darkGray
         
-        navigationController!.toolbar.barTintColor = UIColor.darkGray
+        setToolbarManagement()
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        if isPlaying == true { setToolbarButtonsForPlayingSong("pause.fill") }
+        if isPlaying == true { setToolbarButtonsForPlayingSong(playButton: "pause.circle") }
     }
     
     // MARK: Funciones de tableView
@@ -95,6 +95,12 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
      */
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
+            if indexPath.row == actualSongIndex {
+                audioPlayer.stop()
+                resetUIList()
+                navigationController!.toolbar.isHidden = true
+            }
+            
             let songToBeRemoved = files![indexPath.row]
             let path = docs.appendingPathComponent(songToBeRemoved)
             do {
@@ -115,6 +121,7 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
         let song = files!.remove(at: fromIndexPath.row)
         files!.insert(song, at: to.row)
         UserDefaults.standard.set(files!, forKey: "music")
+        actualSongIndex = to.row
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -137,28 +144,20 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
         return .delete
     }
     
-    // MARK: IBActions y observadores
+    // MARK: Observadores
     
     /**
      * audioPlayerDidFinishPlaying: Cuando la canción ha terminado de reproducirse, se pasa y reproduce la siguiente canción
      */
     func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
-        actualSongIndex? = audioPlayer.nextSong(currentIndex: actualSongIndex!, hasShuffle: false, totalSongs: files!.count)
-		
-		let next = files![actualSongIndex!]
-		let newSong = docs.appendingPathComponent(next)
-		
-		audioPlayer.setSong(newSong)
-        audioPlayer.setPlay()
-		audioPlayer.prepareToPlay()
-		audioPlayer.play()
-		
-		setCurrentSongUI()
+        if flag {
+            goNextOrPreviousSong(mode: true, isOnPause: false)
+        }
     }
     
     /**
      * unwindToController: Al ir de la preview de la cancion a la lista, recoge si hay alguna cancion reproduciendose.
-     * Si la hay, se actualizará la IU.
+     * Si la hay, se actualizará la IU y se hace set del nuevo delegado de la vista.
      */
     @IBAction func unwindToSongList(_ unwind: UIStoryboardSegue) {
         let view = unwind.source as! DisplaySongController
@@ -170,6 +169,7 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
 			self.isPlaying = view.isPlaying
             navigationController!.isToolbarHidden = false
 			
+            audioPlayer.setDelegate(sender: self)
 			setCurrentSongUI()
         } else {
             navigationController!.isToolbarHidden = true
@@ -178,10 +178,6 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
 
     /**
      * Prepara las variables para entrar a la preview de la cancion.
-     * Las canciones deben de tener el siguiente formato para su correcto parseo:
-     *
-     *      "artista - nombre.mp3"
-     *
      * @var songRawName: nombre del fichero de la cancion
      * @var actualSongIndex: indice que representa la posicion de la cancion abierta dentro de la lista de las canciones
      * @var songs: lista de canciones
@@ -193,20 +189,26 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "goToPlaySong" {
             if (segue.destination.view != nil) {
-                if isPlaying {
-                    // TODO: Stop Current Song Playing
-                }
-                
-                // TODO: Si song == songPlaying, entrar a la view con los parametros
-                //  del timer puestos con self.player
-                
                 hidesBottomBarWhenPushed = true
+                var selectedRow: Int?
+                if fromToolbarToDisplay {
+                    selectedRow = actualSongIndex
+                } else {
+                    selectedRow = tableView.indexPathForSelectedRow!.row
+                }
                 
                 let view = segue.destination as! DisplaySongController
                 
-                let song = files![tableView.indexPathForSelectedRow!.row]
+                if isPlaying && actualSongIndex == selectedRow {
+                    view.currentSongFromList = true
+                } else {
+                    if isPlaying { audioPlayer.stop() }
+                    view.currentSongFromList = false
+                }
+                
+                let song = files![selectedRow!]
                 view.songRawName = song
-                view.actualSongIndex = tableView.indexPathForSelectedRow!.row
+                view.actualSongIndex = selectedRow!
                 view.songs = files!
                 
                 let songToBePlayed = docs.appendingPathComponent(song)
@@ -215,19 +217,61 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
         }
     }
     
+    // MARK: Funciones de manejo de reproducción
+    
     /**
     * didSelect: Delegado de UITabBar. Actualiza la IU y la canción en función de la pulsación del boton
     * de play/pause, y siguiente/anterior cancion
     */
     @objc private func managePlayAction() {
         if isPlaying {
-            setToolbarButtonsForPlayingSong("play.fill")
+            setToolbarButtonsForPlayingSong(playButton: "play.circle")
             audioPlayer.pause()
         } else {
-            setToolbarButtonsForPlayingSong("pause.fill")
+            setToolbarButtonsForPlayingSong(playButton: "pause.circle")
             audioPlayer.play()
         }
         isPlaying = !isPlaying
+    }
+    
+    private func goNextOrPreviousSong(mode: Bool, isOnPause: Bool) {
+        let prev = actualSongIndex!
+        if mode {
+            actualSongIndex = audioPlayer.nextSong(currentIndex: prev,
+                                                    hasShuffle: false,
+                                                    totalSongs: files!.count)
+        } else {
+            actualSongIndex = audioPlayer.prevSong(currentIndex: prev,
+                                                    hasShuffle: false,
+                                                    totalSongs: files!.count)
+        }
+        
+        let next = files![actualSongIndex!]
+        let newSong = docs.appendingPathComponent(next)
+        
+        resetUIList()
+        setCurrentSongUI()
+        
+        audioPlayer.setSong(song: newSong)
+        audioPlayer.setDelegate(sender: self)
+        audioPlayer.setPlay()
+        
+        if !isOnPause {
+            setToolbarButtonsForPlayingSong(playButton: "pause.circle")
+            audioPlayer.prepareToPlay()
+            audioPlayer.play()
+        } else {
+            setToolbarButtonsForPlayingSong(playButton: "play.circle")
+        }
+    }
+    
+    @objc private func previousSong() { goNextOrPreviousSong(mode: false, isOnPause: !audioPlayer.getIsPlaying()) }
+    
+    @objc private func nextSong() { goNextOrPreviousSong(mode: true, isOnPause: !audioPlayer.getIsPlaying()) }
+    
+    @objc private func displaySong() {
+        fromToolbarToDisplay = true
+        performSegue(withIdentifier: "goToPlaySong", sender: nil)
     }
     
     /**
@@ -272,8 +316,11 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
         }
     }
 	
+    /**
+     * setCurrentSongUI: Actualiza la interfaz para pintar de amarillo la cancion que está sonando en la lista
+     */
 	private func setCurrentSongUI() {
-		cellOfPlayingSong = tableView.cellForRow(at: IndexPath(row: actualSongIndex, section: 0))
+        cellOfPlayingSong = tableView.cellForRow(at: IndexPath(row: actualSongIndex!, section: 0))
 		cellOfPlayingSong?.textLabel?.textColor = UIColor.systemYellow
 		cellOfPlayingSong?.detailTextLabel?.textColor = UIColor.systemYellow
 	}
@@ -287,37 +334,63 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
     }
     
     /**
-     * createCustomButton: Crea un boton personalizado para la UIToolbar
-     */
-    private func createCustomButton(_ image: String?, _ title: String?) -> UIBarButtonItem {
-        let button = UIButton(type: .custom)
-
-        button.layer.cornerRadius = 5
-        button.layer.masksToBounds = true
+    * setToolbarManagement: Añade GestureRecognizers a la toolbar cuando una canción se está reproduciendo.
+    * Swipe a la izquierda: NextSong
+    * Swipe a la derecha: PreviousSong
+    * Tap -> Lleva a la canción que está sonando
+    */
+    private func setToolbarManagement() {
+        navigationController!.toolbar.barTintColor = UIColor.darkGray
         
+        let swipeRight = UISwipeGestureRecognizer(target: self, action: #selector(previousSong))
+        swipeRight.direction = .right
+        let swipeLeft = UISwipeGestureRecognizer(target: self, action: #selector(nextSong))
+        swipeLeft.direction = .left
+        let tap = UITapGestureRecognizer(target: self, action: #selector(displaySong))
+        tap.numberOfTapsRequired = 1
+        
+        navigationController!.toolbar.addGestureRecognizer(swipeLeft)
+        navigationController!.toolbar.addGestureRecognizer(swipeRight)
+        navigationController!.toolbar.addGestureRecognizer(tap)
+    }
+    
+    /**
+     * createCustomButton: Crea un boton o un label personalizado para la UIToolbar
+     */
+    private func createCustomButton(_ image: String?, _ title: String?, _ detail: String?) -> UIBarButtonItem {
         if let img = image {
+            let button = UIButton(type: .custom)
+            
             button.setBackgroundImage(UIImage(systemName: img), for: .normal)
             button.tintColor = UIColor.white
-        }
-        
-        button.setTitle(title, for: .normal)
-        button.setTitleColor(UIColor.white, for: .normal)
-        
-        if title == nil {
+            
             button.addTarget(self, action: #selector(managePlayAction), for: .touchUpInside)
+            return UIBarButtonItem.init(customView: button)
+        } else {
+            let label = UILabel()
+            
+            if title != nil {
+                label.text = title
+                label.textColor = UIColor.white
+                label.font = UIFont.boldSystemFont(ofSize: 18)
+            } else {
+                label.text = detail
+                label.textColor = UIColor(named: "Detail")
+            }
+            label.numberOfLines = 1
+            return UIBarButtonItem.init(customView: label)
         }
-        
-        return UIBarButtonItem.init(customView: button);
     }
     
     /**
      * setToolbarButtonsForPlayingSong: Crea una customToolbar para la reproduccion de una cancion
      */
-    private func setToolbarButtonsForPlayingSong(_ button: String) {
-        let playButton = createCustomButton(button, nil)
-        let songToolbarText = createCustomButton(nil, "     " + cellOfPlayingSong!.textLabel!.text!)
+    private func setToolbarButtonsForPlayingSong(playButton: String) {
+        let playButton = createCustomButton(playButton, nil, nil)
+        let songToolbarText = createCustomButton(nil, cellOfPlayingSong!.textLabel!.text! + " \u{00B7} ", nil)
+        let artistToolbarText = createCustomButton(nil, nil, cellOfPlayingSong!.detailTextLabel!.text!)
         let blank = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
         
-        toolbarItems = [playButton, songToolbarText, blank]
+        toolbarItems = [songToolbarText, artistToolbarText, blank, playButton]
     }
 }

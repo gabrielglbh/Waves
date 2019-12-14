@@ -3,6 +3,7 @@
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15510"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -301,7 +302,7 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
                                             <rect key="frame" x="105" y="38.5" width="44" height="14.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="12"/>
-                                            <color key="textColor" red="0.84623274871104737" green="0.84623274871104737" blue="0.84623274871104737" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                                            <color key="textColor" name="Detail"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <imageView opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" image="album" id="HT1-ax-aBF">
@@ -415,7 +416,6 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
                         <viewLayoutGuide key="safeArea" id="hHO-w8-eSz"/>
                     </view>
                     <toolbarItems/>
-                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
                         <outlet property="addSongs" destination="2G8-5E-7iI" id="YDO-LK-A0X"/>
                     </connections>
@@ -465,7 +465,7 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
         <!--Canciones-->
         <scene sceneID="Cag-3Y-GT5">
             <objects>
-                <navigationController interfaceStyle="dark" id="ryF-6B-kFI" sceneMemberID="viewController">
+                <navigationController id="ryF-6B-kFI" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="Canciones" image="music.note" catalog="system" id="Gdy-IB-jXL"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="YCu-eO-dDf">
                         <rect key="frame" x="0.0" y="44" width="414" height="44"/>
@@ -493,5 +493,8 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
         <image name="plus" catalog="system" width="64" height="56"/>
         <image name="repeat" catalog="system" width="64" height="48"/>
         <image name="shuffle" catalog="system" width="64" height="46"/>
+        <namedColor name="Detail">
+            <color red="0.91590370735308468" green="0.91147905176200705" blue="0.92032836294416243" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+        </namedColor>
     </resources>
 </document>
