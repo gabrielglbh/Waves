@@ -10,14 +10,14 @@ import UIKit
 import AVFoundation
 
 class SongListController: UITableViewController, AVAudioPlayerDelegate {
-
-    var docs: URL!
-    var files: [String]?
-    var fm: FileManager!
 	
     // Instancia única para toda la aplicación de la canción que suena
 	let ap = AudioPlayer()
 	var audioPlayer: AudioPlayer!
+    
+    // Instancia para la administración de ficheros
+    let cfm = CustomFileManager(key: "music")
+    let key = "music"
     
 	var actualSongIndex: Int?
     var isShuffleModeActive = false
@@ -39,19 +39,6 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
         self.editButtonItem.tintColor = UIColor.systemYellow
         
         self.title = "Mis Canciones"
-        
-        fm = FileManager.default
-        docs = fm.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        print(docs.path)
-        
-        files = try? fm.contentsOfDirectory(atPath: docs.path)
-        files!.removeAll { $0 == ".DS_Store" }
-        
-        if UserDefaults.standard.object(forKey: "music") == nil {
-            UserDefaults.standard.set(files!, forKey: "music")
-        } else {
-            files = UserDefaults.standard.object(forKey: "music")! as? [String]
-        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -68,14 +55,14 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
         if isPlaying == true { setToolbarButtonsForPlayingSong(playButton: "pause.circle") }
     }
     
-    // MARK: Funciones de tableView
+    // MARK: Funciones de UITableView
 
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return files!.count
+        return cfm.getCountFiles()
     }
 
     /**
@@ -84,8 +71,8 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
         
-        let song_name = files![indexPath.row]
-        getAndSetDataFromID3(docs.appendingPathComponent(song_name), cell: cell)
+        let song_name = cfm.getFile(at: indexPath.row)
+        getAndSetDataFromID3(cfm.getURLFromDoc(of: song_name), cell: cell)
         
         cell.textLabel?.font = UIFont.boldSystemFont(ofSize: 18)
 
@@ -103,14 +90,8 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
                 navigationController!.toolbar.isHidden = true
             }
             
-            let songToBeRemoved = files![indexPath.row]
-            let path = docs.appendingPathComponent(songToBeRemoved)
-            do {
-                try fm.removeItem(at: path)
-            } catch { print("Error al eliminar") }
-            
-            files = try? fm.contentsOfDirectory(atPath: docs.path)
-            UserDefaults.standard.set(files!, forKey: "music")
+            let songToBeRemoved = cfm.getFile(at: indexPath.row)
+            cfm.removeInstance(songToBeRemoved: songToBeRemoved, key: key)
             
             tableView.deleteRows(at: [indexPath], with: .fade)
         }
@@ -120,9 +101,7 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
      * moveRowAt: Al mover una cancion se actualizan los indices
      */
     override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-        let song = files!.remove(at: fromIndexPath.row)
-        files!.insert(song, at: to.row)
-        UserDefaults.standard.set(files!, forKey: "music")
+        cfm.updateInstance(from: fromIndexPath.row, to: to.row, key: key)
         actualSongIndex = to.row
     }
     
@@ -207,12 +186,13 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
                     view.currentSongFromList = false
                 }
                 
-                let song = files![selectedRow!]
+                // TODO: Fallo
+                let song = cfm.getFile(at: selectedRow!)
                 view.songRawName = song
                 view.actualSongIndex = selectedRow!
-                view.songs = files!
+                view.songs = cfm.getFiles()
                 
-                let songToBePlayed = docs.appendingPathComponent(song)
+                let songToBePlayed = cfm.getURLFromDoc(of: song)
                 view.songToBePlayed = songToBePlayed
                 
                 view.isShuffleModeActive = !self.isShuffleModeActive
@@ -244,18 +224,18 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
             if mode {
                 actualSongIndex = audioPlayer.nextSong(currentIndex: prev,
                                                         hasShuffle: isShuffleModeActive,
-                                                        totalSongs: files!.count)
+                                                        totalSongs: cfm.getCountFiles())
             } else {
                 actualSongIndex = audioPlayer.prevSong(currentIndex: prev,
                                                         hasShuffle: isShuffleModeActive,
-                                                        totalSongs: files!.count)
+                                                        totalSongs: cfm.getCountFiles())
             }
             resetUIList()
             setCurrentSongUI()
         }
         
-        let next = files![actualSongIndex!]
-        let newSong = docs.appendingPathComponent(next)
+        let next = cfm.getFile(at: actualSongIndex!)
+        let newSong = cfm.getURLFromDoc(of: next)
         
         audioPlayer.setSong(song: newSong)
         audioPlayer.setDelegate(sender: self)
@@ -277,16 +257,6 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
     @objc private func displaySong() {
         fromToolbarToDisplay = true
         performSegue(withIdentifier: "goToPlaySong", sender: nil)
-    }
-    
-    /**
-     * refreshLibrary: Actualiza la biblioteca de música por si se ha añadido alguna canción nueva
-     * mientras la aplicación se está ejecutando
-     */
-    private func refreshLibrary() {
-        files = try? fm.contentsOfDirectory(atPath: docs.path)
-        files!.removeAll { $0 == ".DS_Store" }
-        tableView.reloadData()
     }
     
     // MARK: Funciones Auxiliares
@@ -320,7 +290,7 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
             cell!.imageView?.image = UIImage(named: "album")
         }
     }
-	
+
     /**
      * setCurrentSongUI: Actualiza la interfaz para pintar de amarillo la cancion que está sonando en la lista
      */
@@ -331,7 +301,7 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
 	}
     
     private func resetUIList() {
-        for song in 0...files!.count {
+        for song in 0...cfm.getCountFiles() {
             let cell = tableView.cellForRow(at: IndexPath(row: song, section: 0))
             cell?.textLabel?.textColor = UIColor.white
             cell?.detailTextLabel?.textColor = UIColor.white

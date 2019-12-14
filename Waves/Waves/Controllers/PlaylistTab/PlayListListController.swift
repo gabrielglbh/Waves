@@ -11,10 +11,6 @@ import UIKit
 class PlayListListController: UITableViewController {
     
     var playlists = [String]()
-    var modification = false
-    
-    var alertIndex: Int!
-    var alertText: String!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -37,6 +33,8 @@ class PlayListListController: UITableViewController {
         
         navigationController!.toolbar.barTintColor = UIColor.darkGray
     }
+    
+    // MARK: Funciones de UITableView
     
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
@@ -78,9 +76,6 @@ class PlayListListController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        alertIndex = tableView.indexPathForSelectedRow!.row
-        let cell = tableView.cellForRow(at: indexPath)
-        alertText = cell?.textLabel?.text
         tableView.deselectRow(at: indexPath, animated: true)
     }
    
@@ -100,48 +95,17 @@ class PlayListListController: UITableViewController {
         return .delete
     }
     
-    @objc private func modifyPlaylist() {
-        modification = true
-        addPlaylist()
+    // MARK: Manejo de botones
+    
+    @objc private func modifyPlaylist(l: UILongPressGestureRecognizer) {
+        let p = l.location(in: self.tableView)
+        let indexPath = self.tableView.indexPathForRow(at: p)
+        
+        createAlert(isModificationMode: true, indexPath!.row)
     }
     
     @IBAction private func addPlaylist() {
-        let alert = UIAlertController(title: "Añadir Playlist", message: nil, preferredStyle: .alert)
-        
-        alert.addTextField(configurationHandler: {
-            textField in
-            if self.modification { textField.text = self.alertText }
-            textField.isSecureTextEntry = false
-            textField.placeholder = "Nombre"
-        })
-        
-        let add = UIAlertAction(title: "Ok", style: .default, handler: {
-            action in
-            let playlist = alert.textFields![0].text!
-            if playlist != "" {
-                if self.modification {
-                    self.playlists.remove(at: self.alertIndex)
-                    self.playlists.insert(playlist, at: self.alertIndex)
-                } else {
-                    self.playlists.insert(playlist, at: 0)
-                }
-                
-                self.modification = false
-                UserDefaults.standard.set(self.playlists, forKey: "playlists")
-                self.tableView.reloadData()
-            }
-        })
-        
-        let dismiss = UIAlertAction(title: "Atrás", style: .default, handler: {
-            action in
-            self.modification = false
-            self.dismiss(animated: true, completion: nil)
-        })
-        
-        alert.addAction(dismiss)
-        alert.addAction(add)
-        alert.view.tintColor = UIColor.darkGray
-        present(alert, animated: true)
+        createAlert(isModificationMode: false, nil)
     }
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -151,5 +115,46 @@ class PlayListListController: UITableViewController {
                 view.title = playlists[tableView.indexPathForSelectedRow!.row]
             }
         }
+    }
+    
+    // MARK: Funciones auxiliares
+    
+    private func createAlert(isModificationMode: Bool, _ index: Int?) {
+        let alert = UIAlertController(title: "Añadir Playlist", message: nil, preferredStyle: .alert)
+        
+        alert.addTextField(configurationHandler: {
+            textField in
+            if isModificationMode {
+                textField.text = self.playlists[index!]
+            }
+            textField.isSecureTextEntry = false
+            textField.placeholder = "Nombre"
+        })
+        
+        let add = UIAlertAction(title: "Ok", style: .default, handler: {
+            action in
+            let playlist = alert.textFields![0].text!
+            if playlist != "" {
+                if isModificationMode {
+                    self.playlists.remove(at: index!)
+                    self.playlists.insert(playlist, at: index!)
+                } else {
+                    self.playlists.insert(playlist, at: 0)
+                }
+                
+                UserDefaults.standard.set(self.playlists, forKey: "playlists")
+                self.tableView.reloadData()
+            }
+        })
+        
+        let dismiss = UIAlertAction(title: "Atrás", style: .default, handler: {
+            action in
+            self.dismiss(animated: true, completion: nil)
+        })
+        
+        alert.addAction(dismiss)
+        alert.addAction(add)
+        alert.view.tintColor = UIColor.darkGray
+        present(alert, animated: true)
     }
 }

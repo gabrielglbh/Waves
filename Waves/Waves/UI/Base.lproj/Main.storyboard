@@ -276,6 +276,85 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
             <point key="canvasLocation" x="3048" y="1057"/>
         </scene>
         <!--Root View Controller-->
+        <scene sceneID="WS7-lA-UPw">
+            <objects>
+                <tableViewController id="1d6-sG-mL9" customClass="SelectSongsController" customModule="Waves" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" allowsMultipleSelection="YES" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="GTd-iO-plY">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" cocoaTouchSystemColor="scrollViewTexturedBackgroundColor"/>
+                        <color key="tintColor" systemColor="systemYellowColor" red="1" green="0.80000000000000004" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="SelectSongCell" textLabel="JaL-af-B9r" detailTextLabel="VQd-Wt-Qm8" imageView="7hV-Fr-gDU" rowHeight="70" style="IBUITableViewCellStyleSubtitle" id="rhG-A3-qmJ">
+                                <rect key="frame" x="0.0" y="28" width="414" height="70"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="rhG-A3-qmJ" id="4Hq-te-HvU">
+                                    <rect key="frame" x="0.0" y="0.0" width="414" height="70"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="JaL-af-B9r">
+                                            <rect key="frame" x="105" y="14" width="35.5" height="21.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                                            <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Subtitle" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="VQd-Wt-Qm8">
+                                            <rect key="frame" x="105" y="38.5" width="44" height="14.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                            <color key="textColor" name="Detail"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <imageView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" image="album" id="7hV-Fr-gDU">
+                                            <rect key="frame" x="20" y="0.0" width="70" height="70"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </imageView>
+                                    </subviews>
+                                    <color key="backgroundColor" cocoaTouchSystemColor="scrollViewTexturedBackgroundColor"/>
+                                </tableViewCellContentView>
+                                <color key="backgroundColor" cocoaTouchSystemColor="scrollViewTexturedBackgroundColor"/>
+                                <color key="tintColor" systemColor="systemYellowColor" red="1" green="0.80000000000000004" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="1d6-sG-mL9" id="VmK-ml-j2K"/>
+                            <outlet property="delegate" destination="1d6-sG-mL9" id="cjf-EZ-mcJ"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" title="Root View Controller" id="6Qe-BH-XhO">
+                        <barButtonItem key="rightBarButtonItem" title="Guardar" image="checkmark" catalog="system" id="HwK-f4-bi8">
+                            <color key="tintColor" systemColor="systemYellowColor" red="1" green="0.80000000000000004" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <connections>
+                                <action selector="backToPlaylist" destination="1d6-sG-mL9" id="LzN-0c-6mv"/>
+                                <segue destination="2Ej-AX-8Hu" kind="unwind" identifier="getSongsForPlaylist" unwindAction="unwindToDisplayPlaylist:" id="hKh-1F-6Oc"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="UbE-BY-Ge8" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                <exit id="2Ej-AX-8Hu" userLabel="Exit" sceneMemberID="exit"/>
+            </objects>
+            <point key="canvasLocation" x="3967" y="1726"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="Cfx-Pn-J3R">
+            <objects>
+                <navigationController id="DC9-uM-ARx" sceneMemberID="viewController">
+                    <navigationItem key="navigationItem" id="v1T-fg-mi5"/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="hwY-O1-GxP">
+                        <rect key="frame" x="0.0" y="44" width="414" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="1d6-sG-mL9" kind="relationship" relationship="rootViewController" id="6pi-sj-1V4"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="6Xl-Ph-XUv" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3048" y="1726"/>
+        </scene>
+        <!--Root View Controller-->
         <scene sceneID="u21-yz-Sqh">
             <objects>
                 <tableViewController id="E3h-BT-got" customClass="SongListController" customModule="Waves" customModuleProvider="target" sceneMemberID="viewController">
@@ -405,6 +484,9 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
                                 <state key="normal" title="Añadir Canción">
                                     <color key="titleColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </state>
+                                <connections>
+                                    <segue destination="DC9-uM-ARx" kind="show" identifier="selectSongs" id="tIx-4Z-Xqj"/>
+                                </connections>
                             </button>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="eZy-Mc-1Fc">
                                 <rect key="frame" x="0.0" y="202" width="414" height="611"/>
@@ -525,6 +607,7 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
     <resources>
         <image name="album" width="512" height="512"/>
         <image name="backward.end.fill" catalog="system" width="64" height="50"/>
+        <image name="checkmark" catalog="system" width="64" height="56"/>
         <image name="chevron.down" catalog="system" width="64" height="36"/>
         <image name="chevron.left" catalog="system" width="48" height="64"/>
         <image name="forward.end.fill" catalog="system" width="64" height="50"/>
@@ -536,10 +619,10 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
         <image name="repeat" catalog="system" width="64" height="48"/>
         <image name="shuffle" catalog="system" width="64" height="46"/>
         <namedColor name="Detail">
-            <color red="0.91590370735308468" green="0.91147905176200705" blue="0.92032836294416243" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+            <color red="0.91600000858306885" green="0.91100001335144043" blue="0.92000001668930054" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
         </namedColor>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="bYj-br-k7k"/>
+        <segue reference="SmI-vE-uLJ"/>
     </inferredMetricsTieBreakers>
 </document>

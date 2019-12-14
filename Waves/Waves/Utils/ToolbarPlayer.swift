@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import AVFoundation
 
 class ToolbarPlayer: NSObject {
     // TODO: Singleton de la toolbar para manjear la cancion en background
