@@ -11,25 +11,18 @@ import AVFoundation
 
 class SelectSongsController: UITableViewController {
 
-    var docs: URL!
-    var files: [String]?
-    var fm: FileManager!
-    
-    var selectedSongs: [Int]?
+    var cfm = CustomFileManager()
+    var selectedSongs = [Int]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         self.title = "Elige Canciones"
-        
-        fm = FileManager.default
-        docs = fm.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        
-        files = try? fm.contentsOfDirectory(atPath: docs.path)
-        files!.removeAll { $0 == ".DS_Store" }
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        cfm.setFiles()
+        
         navigationController!.navigationBar.titleTextAttributes =
             [NSAttributedString.Key.foregroundColor: UIColor.systemYellow]
         navigationController!.navigationBar.barTintColor = UIColor.darkGray
@@ -42,14 +35,14 @@ class SelectSongsController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return files!.count
+        return cfm.getCountFiles()
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "SelectSongCell", for: indexPath)
         
-        let song_name = files![indexPath.row]
-        getAndSetDataFromID3(docs.appendingPathComponent(song_name), cell: cell)
+        let song_name = cfm.getFile(at: indexPath.row)
+        getAndSetDataFromID3(cfm.getURLFromDoc(of: song_name), cell: cell)
         
         cell.textLabel?.font = UIFont.boldSystemFont(ofSize: 18)
 
@@ -58,21 +51,21 @@ class SelectSongsController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
+        selectedSongs.append(indexPath.row)
     }
     
     override func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
         tableView.cellForRow(at: indexPath)?.accessoryType = .none
+        for (ind, row) in selectedSongs.enumerated() {
+            if row == indexPath.row {
+                selectedSongs.remove(at: ind)
+            }
+        }
     }
     
     // MARK: Funciones auxiliares
     
     @IBAction private func backToPlaylist(_ sender: Any) {
-        let indexPaths = tableView.indexPathsForSelectedRows!
-        for ind in 0..<indexPaths.count {
-            let v = indexPaths[ind] as IndexPath
-            print(v.row)
-            selectedSongs?.append(v.row)
-        }
         performSegue(withIdentifier: "getSongsForPlaylist", sender: self)
     }
     

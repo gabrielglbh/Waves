@@ -12,7 +12,7 @@ import MediaPlayer
 
 // MARK: Instancia SINGLETON para que el reproductor sea accesible en toda la aplicación
 
-class AudioPlayer: NSObject {
+class AudioPlayer {
 
 	static var sharedInstance = AudioPlayer()
 	private var player: AVAudioPlayer!

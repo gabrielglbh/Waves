@@ -39,6 +39,9 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
         self.editButtonItem.tintColor = UIColor.systemYellow
         
         self.title = "Mis Canciones"
+        
+        cfm.reloadData()
+        tableView.reloadData()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -186,11 +189,10 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
                     view.currentSongFromList = false
                 }
                 
-                // TODO: Fallo
                 let song = cfm.getFile(at: selectedRow!)
                 view.songRawName = song
                 view.actualSongIndex = selectedRow!
-                view.songs = cfm.getFiles()
+                view.key = key
                 
                 let songToBePlayed = cfm.getURLFromDoc(of: song)
                 view.songToBePlayed = songToBePlayed
@@ -199,6 +201,8 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
                 view.isRepeatModeActive = !self.isRepeatModeActive
             }
         }
+        
+        fromToolbarToDisplay = false
     }
     
     // MARK: Funciones de manejo de reproducción

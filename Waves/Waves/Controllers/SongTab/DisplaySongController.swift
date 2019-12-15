@@ -13,8 +13,6 @@ import MediaPlayer
 class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
 
     var songToBePlayed: URL?
-    var docs: URL!
-    var songs: [String]?
     var songRawName: String?
     var actualSongIndex: Int?
     var currentSongFromList: Bool?
@@ -22,6 +20,10 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
 	// Instancia única para toda la aplicación de la canción que suena
 	let ap = AudioPlayer()
 	var audioPlayer: AudioPlayer!
+    
+    var cfm = CustomFileManager()
+    var key = "music"
+    
     var songTime = Timer()
     
     var isPlaying = true
@@ -46,7 +48,6 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
      */
     override func viewDidLoad() {
         super.viewDidLoad()
-        docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
         title = "Waves"
     }
     
@@ -55,6 +56,9 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
      * vista de la aplicación
      */
     override func viewWillAppear(_ animated: Bool) {
+        cfm.setCFM(key: key)
+        cfm.reloadData()
+        
 		audioPlayer = ap.getInstance()
 		getAndSetDataFromID3(songToBePlayed!)
         
@@ -261,15 +265,14 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
 				if mode {
 					actualSongIndex = audioPlayer.nextSong(currentIndex: prev,
                                                             hasShuffle: isShuffleModeActive,
-                                                            totalSongs: songs!.count)
+                                                            totalSongs: cfm.getCountFiles())
 				} else {
 					actualSongIndex = audioPlayer.prevSong(currentIndex: prev,
                                                             hasShuffle: isShuffleModeActive,
-                                                            totalSongs: songs!.count)
+                                                            totalSongs: cfm.getCountFiles())
                 }
                 
-                let next = songs![actualSongIndex!]
-                let newSong = docs.appendingPathComponent(next)
+                let newSong = cfm.getNextSong(from: actualSongIndex!)
                 songToBePlayed = newSong
                 
                 if hasEnded {

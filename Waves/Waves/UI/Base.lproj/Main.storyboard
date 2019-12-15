@@ -492,7 +492,7 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
                                 <rect key="frame" x="0.0" y="202" width="414" height="611"/>
                                 <color key="backgroundColor" cocoaTouchSystemColor="scrollViewTexturedBackgroundColor"/>
                                 <prototypes>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="V7X-aX-RuP" detailTextLabel="OTl-5J-xXQ" imageView="1B3-ac-4CD" rowHeight="70" style="IBUITableViewCellStyleSubtitle" id="V9w-hb-Omo">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="songPlaylist" textLabel="V7X-aX-RuP" detailTextLabel="OTl-5J-xXQ" imageView="1B3-ac-4CD" rowHeight="70" style="IBUITableViewCellStyleSubtitle" id="V9w-hb-Omo">
                                         <rect key="frame" x="0.0" y="28" width="414" height="70"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="V9w-hb-Omo" id="03t-lM-gTR">
@@ -521,7 +521,7 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
                                         </tableViewCellContentView>
                                         <color key="backgroundColor" cocoaTouchSystemColor="scrollViewTexturedBackgroundColor"/>
                                         <connections>
-                                            <segue destination="BYZ-38-t0r" kind="show" id="SmI-vE-uLJ"/>
+                                            <segue destination="BYZ-38-t0r" kind="show" identifier="goToPlaySongFromPlaylist" id="SmI-vE-uLJ"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>
@@ -542,6 +542,7 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
                     <toolbarItems/>
                     <connections>
                         <outlet property="addSongs" destination="2G8-5E-7iI" id="YDO-LK-A0X"/>
+                        <outlet property="tableView" destination="eZy-Mc-1Fc" id="tym-Me-kuq"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Ct3-ik-UFA" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
