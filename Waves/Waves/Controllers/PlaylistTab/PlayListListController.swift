@@ -30,8 +30,6 @@ class PlayListListController: UITableViewController {
         navigationController!.navigationBar.titleTextAttributes =
             [NSAttributedString.Key.foregroundColor: UIColor.systemYellow]
         navigationController!.navigationBar.barTintColor = UIColor.darkGray
-        
-        navigationController!.toolbar.barTintColor = UIColor.darkGray
     }
     
     // MARK: Funciones de UITableView
@@ -111,7 +109,7 @@ class PlayListListController: UITableViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "getPlaylist" {
             if (segue.destination.view != nil) {
-                let view = segue.destination as! DisplayPlaylistController
+                let view = segue.destination as! DisplayContentPlaylistController
                 view.title = playlists[tableView.indexPathForSelectedRow!.row]
             }
         }

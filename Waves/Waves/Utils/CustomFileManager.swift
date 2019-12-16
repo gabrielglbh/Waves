@@ -13,26 +13,29 @@ class CustomFileManager {
     private var docs: URL!
     private var files: [String]?
     private var fm: FileManager!
+    private var key: String!
     
     init() { }
     
     init(key: String) {
+        self.key = key
         setFiles()
         
-        if UserDefaults.standard.object(forKey: key) == nil {
-            UserDefaults.standard.set(files!, forKey: key)
+        if UserDefaults.standard.object(forKey: self.key) == nil {
+            UserDefaults.standard.set(files!, forKey: self.key)
         } else {
-            files = UserDefaults.standard.object(forKey: key)! as? [String]
+            files = UserDefaults.standard.object(forKey: self.key)! as? [String]
         }
     }
     
     func setCFM(key: String) {
+        self.key = key
         setFiles()
         
-        if UserDefaults.standard.object(forKey: key) == nil {
-            UserDefaults.standard.set(files!, forKey: key)
+        if UserDefaults.standard.object(forKey: self.key) == nil {
+            UserDefaults.standard.set(files!, forKey: self.key)
         } else {
-            files = UserDefaults.standard.object(forKey: key)! as? [String]
+            files = UserDefaults.standard.object(forKey: self.key)! as? [String]
         }
     }
     
@@ -62,10 +65,10 @@ class CustomFileManager {
         return files![at]
     }
     
-    func getFileFrom(at: Int, from: String, initial: String) -> String {
+    func getFileFrom(at: Int, from: String) -> String {
         setCFM(key: from)
         let file = getFile(at: at)
-        setCFM(key: initial)
+        setCFM(key: self.key)
         return file
     }
     
@@ -78,7 +81,7 @@ class CustomFileManager {
         return getURLFromDoc(of: next)
     }
     
-    func removeInstance(songToBeRemoved: String, key: String) {
+    func removeInstance(songToBeRemoved: String) {
         let path = docs.appendingPathComponent(songToBeRemoved)
         do {
             try fm.removeItem(at: path)
@@ -88,13 +91,13 @@ class CustomFileManager {
         UserDefaults.standard.set(files!, forKey: key)
     }
     
-    func updateInstance(from: Int, to: Int, key: String) {
+    func updateInstance(from: Int, to: Int) {
         let song = files!.remove(at: from)
         files!.insert(song, at: to)
         UserDefaults.standard.set(files!, forKey: key)
     }
     
-    func setUserDefaults(files: [String], key: String) {
+    func setUserDefaults(files: [String]) {
         UserDefaults.standard.set(files, forKey: key)
     }
 }

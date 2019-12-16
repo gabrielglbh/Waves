@@ -29,6 +29,7 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
     var isPlaying = true
     var isRepeatModeActive = false
     var isShuffleModeActive = false
+    var fromPlaylist = false
     
     @IBOutlet var portrait: UIImageView?
     @IBOutlet var songName: UILabel?
@@ -88,7 +89,11 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
     }
     
     @IBAction func goBackToList(_ sender: Any) {
-        performSegue(withIdentifier: "getPlayedSong", sender: self)
+        if fromPlaylist {
+            performSegue(withIdentifier: "getPlayedPlaylistSong", sender: self)
+        } else {
+            performSegue(withIdentifier: "getPlayedSong", sender: self)
+        }
     }
    
     // MARK: Funciones de inicialización de la vista

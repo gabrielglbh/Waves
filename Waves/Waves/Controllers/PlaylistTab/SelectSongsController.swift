@@ -14,6 +14,8 @@ class SelectSongsController: UITableViewController {
     var cfm = CustomFileManager()
     var selectedSongs = [Int]()
     
+    var af = AuxiliarFunctions()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -42,7 +44,7 @@ class SelectSongsController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "SelectSongCell", for: indexPath)
         
         let song_name = cfm.getFile(at: indexPath.row)
-        getAndSetDataFromID3(cfm.getURLFromDoc(of: song_name), cell: cell)
+        af.getAndSetDataFromID3(song: cfm.getURLFromDoc(of: song_name), cell: cell)
         
         cell.textLabel?.font = UIFont.boldSystemFont(ofSize: 18)
 
@@ -67,35 +69,5 @@ class SelectSongsController: UITableViewController {
     
     @IBAction private func backToPlaylist(_ sender: Any) {
         performSegue(withIdentifier: "getSongsForPlaylist", sender: self)
-    }
-    
-    /**
-     * getAndSetDataFromID3: Recoge los metadatos de los archivos .mp3 y popula la celda de la lista
-     */
-    private func getAndSetDataFromID3(_ song: URL, cell: UITableViewCell?) {
-        let p = AVPlayerItem(url: song)
-        let metadataList = p.asset.commonMetadata
-        var count = 1
-        
-        for item in metadataList {
-            switch item.commonKey!.rawValue {
-                case "title":
-                    cell!.textLabel?.text = item.value as? String
-                    break
-                case "artist":
-                    cell!.detailTextLabel?.text = item.value as? String
-                    break
-                case "artwork":
-                    count -= 1
-                    cell!.imageView?.image = UIImage(data: item.value as! Data)
-                    break
-                default:
-                    break
-            }
-        }
-        
-        if count != 0 {
-            cell!.imageView?.image = UIImage(named: "album")
-        }
     }
 }
