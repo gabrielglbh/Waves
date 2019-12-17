@@ -23,7 +23,9 @@ class SelectSongsController: UITableViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        cfm.setFiles()
+        // MARK: TODO - No se recogen todas las canciones del archivo al hacer set de una playlist
+        cfm.setAllFiles()
+        cfm.checkUserDefaults(key: "music")
         
         navigationController!.navigationBar.titleTextAttributes =
             [NSAttributedString.Key.foregroundColor: UIColor.systemYellow]
@@ -38,6 +40,10 @@ class SelectSongsController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return cfm.getCountFiles()
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 70
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

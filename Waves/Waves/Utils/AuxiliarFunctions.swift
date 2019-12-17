@@ -30,8 +30,8 @@ class AuxiliarFunctions {
     }
 
     /**
-     * getAndSetDataFromID3: Recoge de la información de metadatos ID3 de cada canción y popula la celda
-     */
+    * getAndSetDataFromID3: Recoge la información de metadatos ID3 de cada canción y popula la celda
+    */
     func getAndSetDataFromID3(song: URL, cell: UITableViewCell?) {
         let p = AVPlayerItem(url: song)
         let metadataList = p.asset.commonMetadata
@@ -57,5 +57,29 @@ class AuxiliarFunctions {
         if count != 0 {
             cell!.imageView?.image = UIImage(named: "album")
         }
+    }
+    
+    /**
+     * getAndSetDataFromID3ForToolbar: Recoge la información de metadatos ID3 de la canción que está sonando
+     * para poner los campos de la toolbar
+     */
+    func getAndSetDataFromID3ForToolbar(song: URL) -> [String] {
+        let p = AVPlayerItem(url: song)
+        let metadataList = p.asset.commonMetadata
+        var id3_fields = [String]()
+        
+        for item in metadataList {
+            switch item.commonKey!.rawValue {
+                case "title":
+                    id3_fields.append((item.value as? String)!)
+                    break
+                case "artist":
+                    id3_fields.append((item.value as? String)!)
+                    break
+                default:
+                    break
+            }
+        }
+        return id3_fields
     }
 }

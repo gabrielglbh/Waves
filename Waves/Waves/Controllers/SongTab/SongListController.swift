@@ -14,6 +14,7 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
     // Instancia única para toda la aplicación de la canción que suena
 	let ap = AudioPlayer()
 	var audioPlayer: AudioPlayer!
+    var songParams = AudioPlayer.song()
     
     // Instancia para la administración de ficheros
     let cfm = CustomFileManager(key: "music")
@@ -21,10 +22,6 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
     
     let af = AuxiliarFunctions()
     
-	var actualSongIndex: Int?
-    var isShuffleModeActive = false
-    var isRepeatModeActive = false
-    var isPlaying = false
     var fromToolbarToDisplay = false
     
     var playButton: UIBarButtonItem!
@@ -48,16 +45,29 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
     
     override func viewWillAppear(_ animated: Bool) {
 		audioPlayer = ap.getInstance()
+        songParams = audioPlayer.getSongParams()
 	
         navigationController!.navigationBar.titleTextAttributes =
             [NSAttributedString.Key.foregroundColor: UIColor.systemYellow]
         navigationController!.navigationBar.barTintColor = UIColor.darkGray
         
+        hidesBottomBarWhenPushed = false
+        af.resetUIList(tableView, files: cfm.getCountFiles())
+        
+        if audioPlayer.getIsPlaying() {
+            navigationController!.isToolbarHidden = false
+            
+            audioPlayer.setDelegate(sender: self)
+            cellOfPlayingSong = af.setCurrentSongUI(tableView, at: songParams.actualSongIndex)
+        } else {
+            navigationController!.isToolbarHidden = true
+        }
+        
         setToolbarManagement()
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        if isPlaying == true { setToolbarButtonsForPlayingSong(playButton: "pause.circle") }
+        if audioPlayer.getIsPlaying() == true { setToolbarButtonsForPlayingSong(playButton: "pause.circle") }
     }
     
     // MARK: Funciones de UITableView
@@ -89,7 +99,7 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
      */
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            if indexPath.row == actualSongIndex {
+            if indexPath.row == songParams.actualSongIndex && audioPlayer.getIsPlaying() {
                 audioPlayer.stop()
                 af.resetUIList(tableView, files: cfm.getCountFiles())
                 navigationController!.toolbar.isHidden = true
@@ -107,7 +117,8 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
      */
     override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
         cfm.updateInstance(from: fromIndexPath.row, to: to.row)
-        actualSongIndex = to.row
+        songParams.actualSongIndex = to.row
+        audioPlayer.setSongWithParams(songParams: songParams)
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -141,24 +152,30 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
         }
     }
     
+    @IBAction private func resetDefaults() {
+        let defaults = UserDefaults.standard
+        let dictionary = defaults.dictionaryRepresentation()
+        dictionary.keys.forEach { key in
+            defaults.removeObject(forKey: key)
+        }
+        cfm.reloadData()
+        tableView.reloadData()
+    }
+    
     /**
      * unwindToController: Al ir de la preview de la cancion a la lista, recoge si hay alguna cancion reproduciendose.
      * Si la hay, se actualizará la IU y se hace set del nuevo delegado de la vista.
      */
     @IBAction func unwindToSongList(_ unwind: UIStoryboardSegue) {
-        let view = unwind.source as! DisplaySongController
         hidesBottomBarWhenPushed = false
+        songParams = audioPlayer.getSongParams()
         af.resetUIList(tableView, files: cfm.getCountFiles())
         
-        if view.isPlaying {
-			self.actualSongIndex = view.actualSongIndex!
-            self.isShuffleModeActive = view.isShuffleModeActive
-            self.isRepeatModeActive = view.isRepeatModeActive
-			self.isPlaying = view.isPlaying
+        if audioPlayer.getIsPlaying() {
             navigationController!.isToolbarHidden = false
 			
             audioPlayer.setDelegate(sender: self)
-			cellOfPlayingSong = af.setCurrentSongUI(tableView, at: actualSongIndex!)
+            cellOfPlayingSong = af.setCurrentSongUI(tableView, at: songParams.actualSongIndex)
         } else {
             navigationController!.isToolbarHidden = true
         }
@@ -177,33 +194,34 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
                 hidesBottomBarWhenPushed = true
                 var selectedRow: Int?
                 if fromToolbarToDisplay {
-                    selectedRow = actualSongIndex
+                    selectedRow = songParams.actualSongIndex
                 } else {
                     selectedRow = tableView.indexPathForSelectedRow!.row
                 }
                 
                 let view = segue.destination as! DisplaySongController
                 
-                if isPlaying && actualSongIndex == selectedRow {
+                if audioPlayer.getIsPlaying() && songParams.actualSongIndex == selectedRow {
                     view.currentSongFromList = true
                 } else {
-                    if isPlaying { audioPlayer.stop() }
+                    if audioPlayer.getIsPlaying() { audioPlayer.stop() }
                     view.currentSongFromList = false
                 }
                 
                 let song = cfm.getFile(at: selectedRow!)
                 view.songRawName = song
-                view.actualSongIndex = selectedRow!
-                view.key = key
                 view.fromPlaylist = false
                 
                 let songToBePlayed = cfm.getURLFromDoc(of: song)
                 view.songToBePlayed = songToBePlayed
                 
-                view.isShuffleModeActive = !self.isShuffleModeActive
-                view.isRepeatModeActive = !self.isRepeatModeActive
+                songParams.key = key
+                songParams.isShuffleModeActive = !songParams.isShuffleModeActive
+                songParams.isRepeatModeActive = !songParams.isRepeatModeActive
+                songParams.actualSongIndex = selectedRow!
             }
         }
+        audioPlayer.setSongWithParams(songParams: songParams)
         
         fromToolbarToDisplay = false
     }
@@ -212,36 +230,35 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
     
     /**
     * didSelect: Delegado de UITabBar. Actualiza la IU y la canción en función de la pulsación del boton
-    * de play/pause, y siguiente/anterior cancion
+    * de play/pause
     */
     @objc private func managePlayAction() {
-        if isPlaying {
+        if audioPlayer.getIsPlaying() {
             setToolbarButtonsForPlayingSong(playButton: "play.circle")
             audioPlayer.pause()
         } else {
             setToolbarButtonsForPlayingSong(playButton: "pause.circle")
             audioPlayer.play()
         }
-        isPlaying = !isPlaying
     }
     
     private func goNextOrPreviousSong(mode: Bool, isOnPause: Bool) {
-        if !isRepeatModeActive {
-            let prev = actualSongIndex!
+        if !songParams.isRepeatModeActive {
+            let prev = songParams.actualSongIndex
             if mode {
-                actualSongIndex = audioPlayer.nextSong(currentIndex: prev,
-                                                        hasShuffle: isShuffleModeActive,
+                songParams.actualSongIndex = audioPlayer.nextSong(currentIndex: prev,
+                                                        hasShuffle: songParams.isShuffleModeActive,
                                                         totalSongs: cfm.getCountFiles())
             } else {
-                actualSongIndex = audioPlayer.prevSong(currentIndex: prev,
-                                                        hasShuffle: isShuffleModeActive,
+                songParams.actualSongIndex = audioPlayer.prevSong(currentIndex: prev,
+                                                        hasShuffle: songParams.isShuffleModeActive,
                                                         totalSongs: cfm.getCountFiles())
             }
             af.resetUIList(tableView, files: cfm.getCountFiles())
-            cellOfPlayingSong = af.setCurrentSongUI(tableView, at: actualSongIndex!)
+            cellOfPlayingSong = af.setCurrentSongUI(tableView, at: songParams.actualSongIndex)
         }
         
-        let next = cfm.getFile(at: actualSongIndex!)
+        let next = cfm.getFile(at: songParams.actualSongIndex)
         let newSong = cfm.getURLFromDoc(of: next)
         
         audioPlayer.setSong(song: newSong)
@@ -255,6 +272,8 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
         } else {
             setToolbarButtonsForPlayingSong(playButton: "play.circle")
         }
+        
+        audioPlayer.setSongWithParams(songParams: songParams)
     }
     
     @objc private func previousSong() { goNextOrPreviousSong(mode: false, isOnPause: !audioPlayer.getIsPlaying()) }
@@ -321,9 +340,12 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
      * setToolbarButtonsForPlayingSong: Crea una customToolbar para la reproduccion de una cancion
      */
     private func setToolbarButtonsForPlayingSong(playButton: String) {
+        let actualSong = cfm.getFile(at: songParams.actualSongIndex)
+        let id3 = af.getAndSetDataFromID3ForToolbar(song: cfm.getURLFromDoc(of: actualSong))
+        
         let playButton = createCustomButton(playButton, nil, nil)
-        let songToolbarText = createCustomButton(nil, cellOfPlayingSong!.textLabel!.text! + " \u{00B7} ", nil)
-        let artistToolbarText = createCustomButton(nil, nil, cellOfPlayingSong!.detailTextLabel!.text!)
+        let songToolbarText = createCustomButton(nil, id3[0] + " \u{00B7} ", nil)
+        let artistToolbarText = createCustomButton(nil, nil, id3[1])
         let blank = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
         
         toolbarItems = [songToolbarText, artistToolbarText, blank, playButton]

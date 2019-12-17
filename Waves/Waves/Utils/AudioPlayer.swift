@@ -13,15 +13,35 @@ import MediaPlayer
 // MARK: Instancia SINGLETON para que el reproductor sea accesible en toda la aplicación
 
 class AudioPlayer {
-
-	static var sharedInstance = AudioPlayer()
-	private var player: AVAudioPlayer!
+    // Estructura que define una cancion
+    struct song {
+        // Variable para determinar desde dónde se está reproduciendo la canción
+        var key = "music"
+        // Variables para el control de la canción
+        var actualSongIndex = 0
+        var isShuffleModeActive = false
+        var isRepeatModeActive = false
+    }
+    static var sharedInstance = AudioPlayer()
+    private var player: AVAudioPlayer!
+    private var songParams = song()
 	
 	func getInstance() -> AudioPlayer {
         return AudioPlayer.sharedInstance
 	}
-	
-	func setSong(song: URL) {
+    
+    func setSongWithParams(songParams: song) {
+        self.songParams.key = songParams.key
+        self.songParams.actualSongIndex = songParams.actualSongIndex
+        self.songParams.isShuffleModeActive = songParams.isShuffleModeActive
+        self.songParams.isRepeatModeActive = songParams.isRepeatModeActive
+    }
+    
+    func getSongParams() -> song {
+        return self.songParams
+    }
+    
+    func setSong(song: URL) {
 		player = try! AVAudioPlayer(contentsOf: song)
 	}
 	
@@ -88,7 +108,11 @@ class AudioPlayer {
 	}
 	
 	func getIsPlaying() -> Bool {
-		return self.player.isPlaying
+        if self.player == nil {
+            return false
+        } else {
+            return self.player.isPlaying
+        }
 	}
 	
 	func setCurrentTime(at: Double) {

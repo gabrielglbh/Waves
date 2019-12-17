@@ -184,7 +184,7 @@
                             <color key="tintColor" systemColor="systemYellowColor" red="1" green="0.80000000000000004" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
                                 <action selector="goBackToList" destination="BYZ-38-t0r" id="ebH-CL-QpK"/>
-                                <segue destination="Fit-rK-7TL" kind="unwind" identifier="getPlayedSong" unwindAction="unwindToSongList:" id="Jkb-qD-qeE"/>
+                                <segue destination="Fit-rK-7TL" kind="unwind" identifier="getPlayedSong" unwindAction="unwindToSongList:" id="WIn-7T-R9Q"/>
                             </connections>
                         </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" title="Lyrics" style="plain" id="bxK-s7-hfI">
@@ -335,7 +335,7 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
                 <placeholder placeholderIdentifier="IBFirstResponder" id="UbE-BY-Ge8" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
                 <exit id="2Ej-AX-8Hu" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
-            <point key="canvasLocation" x="4807" y="2125"/>
+            <point key="canvasLocation" x="4068" y="2455"/>
         </scene>
         <!--Root View Controller-->
         <scene sceneID="fs4-Az-hHB">
@@ -357,14 +357,14 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
                                             <rect key="frame" x="105" y="15" width="33.5" height="20.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                            <nil key="textColor"/>
+                                            <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Subtitle" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="e2c-vD-xfn">
                                             <rect key="frame" x="105" y="38.5" width="44" height="14.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="12"/>
-                                            <nil key="textColor"/>
+                                            <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <imageView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" image="album" id="W0b-g2-61d">
@@ -385,7 +385,7 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Root View Controller" id="qXv-ft-9L9">
-                        <barButtonItem key="leftBarButtonItem" title="Add" image="plus" catalog="system" style="plain" id="ajj-sS-dG4">
+                        <barButtonItem key="rightBarButtonItem" title="Add" image="plus" catalog="system" style="plain" id="ajj-sS-dG4">
                             <color key="tintColor" systemColor="systemYellowColor" red="1" green="0.80000000000000004" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
                                 <segue destination="DC9-uM-ARx" kind="presentation" identifier="selectSongs" id="5Eg-b0-Wkq"/>
@@ -394,23 +394,6 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
                     </navigationItem>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="yoe-fL-PoG" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="3032" y="1726"/>
-        </scene>
-        <!--Navigation Controller-->
-        <scene sceneID="kM9-VE-jwY">
-            <objects>
-                <navigationController id="uRd-Ti-FpV" sceneMemberID="viewController">
-                    <navigationItem key="navigationItem" id="rfV-fv-4mF"/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="jpA-nz-Wxk">
-                        <rect key="frame" x="0.0" y="44" width="414" height="44"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                    </navigationBar>
-                    <connections>
-                        <segue destination="w8R-cX-414" kind="relationship" relationship="rootViewController" id="3qG-c1-KWB"/>
-                    </connections>
-                </navigationController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="q2a-XG-Rpi" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2112" y="1726"/>
         </scene>
@@ -429,7 +412,7 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="6Xl-Ph-XUv" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3920" y="2125"/>
+            <point key="canvasLocation" x="3048" y="2455"/>
         </scene>
         <!--Root View Controller-->
         <scene sceneID="u21-yz-Sqh">
@@ -481,7 +464,14 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
                             <outlet property="delegate" destination="E3h-BT-got" id="uwJ-8O-PCI"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Root View Controller" id="AQE-GA-oS9"/>
+                    <navigationItem key="navigationItem" title="Root View Controller" id="AQE-GA-oS9">
+                        <barButtonItem key="leftBarButtonItem" title="Item" image="arrow.clockwise" catalog="system" id="NXB-u5-5wS">
+                            <color key="tintColor" systemColor="systemYellowColor" red="1" green="0.80000000000000004" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <connections>
+                                <action selector="resetDefaults" destination="E3h-BT-got" id="LbV-0Y-msw"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="5mM-NM-pTd" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
@@ -519,7 +509,7 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
                                 <color key="backgroundColor" cocoaTouchSystemColor="scrollViewTexturedBackgroundColor"/>
                                 <color key="tintColor" systemColor="systemYellowColor" red="1" green="0.80000000000000004" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <connections>
-                                    <segue destination="uRd-Ti-FpV" kind="show" identifier="getPlaylist" id="jSf-HB-4uX"/>
+                                    <segue destination="w8R-cX-414" kind="show" identifier="getPlaylist" id="Yrh-sC-cXH"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>
@@ -529,7 +519,7 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Root View Controller" id="rOK-u2-Qhh">
-                        <barButtonItem key="leftBarButtonItem" title="Item" image="plus" catalog="system" id="9lo-yD-9p3">
+                        <barButtonItem key="rightBarButtonItem" title="Item" image="plus" catalog="system" id="9lo-yD-9p3">
                             <color key="tintColor" systemColor="systemYellowColor" red="1" green="0.80000000000000004" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
                                 <action selector="addPlaylist" destination="CaW-XK-o3i" id="0aK-1Z-wFa"/>
@@ -806,11 +796,12 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
                 <placeholder placeholderIdentifier="IBFirstResponder" id="5BC-9M-OHb" sceneMemberID="firstResponder"/>
                 <exit id="e5I-54-hgu" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
-            <point key="canvasLocation" x="3919" y="1390"/>
+            <point key="canvasLocation" x="3048" y="1726"/>
         </scene>
     </scenes>
     <resources>
         <image name="album" width="512" height="512"/>
+        <image name="arrow.clockwise" catalog="system" width="56" height="64"/>
         <image name="backward.end.fill" catalog="system" width="64" height="50"/>
         <image name="checkmark" catalog="system" width="64" height="56"/>
         <image name="chevron.down" catalog="system" width="64" height="36"/>

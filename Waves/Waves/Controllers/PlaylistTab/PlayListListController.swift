@@ -7,15 +7,34 @@
 //
 
 import UIKit
+import AVFoundation
 
-class PlayListListController: UITableViewController {
+class PlayListListController: UITableViewController, AVAudioPlayerDelegate {
     
     var playlists = [String]()
+    
+    // Instancia única para toda la aplicación de la canción que suena
+    let ap = AudioPlayer()
+    var audioPlayer: AudioPlayer!
+    var songParams = AudioPlayer.song()
+    
+    // Instancia para la administración de ficheros
+    let cfm = CustomFileManager()
+    
+    let af = AuxiliarFunctions()
+    
+    var fromToolbarToDisplay = false
+    
+    var playButton: UIBarButtonItem!
+    var songToolbarText: UIBarButtonItem!
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.navigationItem.rightBarButtonItem = self.editButtonItem
+        
+        let add = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addPlaylist))
         self.editButtonItem.tintColor = UIColor.systemYellow
+        add.tintColor = UIColor.systemYellow
+        self.navigationItem.rightBarButtonItems = [self.editButtonItem, add]
         
         title = "Mis Listas"
         
@@ -27,9 +46,25 @@ class PlayListListController: UITableViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        audioPlayer = ap.getInstance()
+        songParams = audioPlayer.getSongParams()
+        cfm.setCFM(key: songParams.key, isPlaylist: false)
+        
         navigationController!.navigationBar.titleTextAttributes =
             [NSAttributedString.Key.foregroundColor: UIColor.systemYellow]
         navigationController!.navigationBar.barTintColor = UIColor.darkGray
+        
+        setToolbarManagement()
+        
+        if audioPlayer.getIsPlaying() {
+            navigationController!.isToolbarHidden = false
+        } else {
+            navigationController!.isToolbarHidden = true
+        }
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        if audioPlayer.getIsPlaying() == true { setToolbarButtonsForPlayingSong(playButton: "pause.circle") }
     }
     
     // MARK: Funciones de UITableView
@@ -61,6 +96,7 @@ class PlayListListController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
+            UserDefaults.standard.removeObject(forKey: playlists[indexPath.row])
             playlists.remove(at: indexPath.row)
             UserDefaults.standard.set(playlists, forKey: "playlists")
             tableView.deleteRows(at: [indexPath], with: .fade)
@@ -115,10 +151,146 @@ class PlayListListController: UITableViewController {
         }
     }
     
-    // MARK: Funciones auxiliares
+    /**
+     * audioPlayerDidFinishPlaying: Cuando la canción ha terminado de reproducirse, se pasa y reproduce la siguiente canción
+     */
+    func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
+        if flag {
+            goNextOrPreviousSong(mode: true, isOnPause: false)
+        }
+    }
+    
+    // MARK: Funciones de manejo de reproducción
+    
+    /**
+    * didSelect: Delegado de UITabBar. Actualiza la IU y la canción en función de la pulsación del boton
+    * de play/pause
+    */
+    @objc private func managePlayAction() {
+        if audioPlayer.getIsPlaying() {
+            setToolbarButtonsForPlayingSong(playButton: "play.circle")
+            audioPlayer.pause()
+        } else {
+            setToolbarButtonsForPlayingSong(playButton: "pause.circle")
+            audioPlayer.play()
+        }
+    }
+    
+    private func goNextOrPreviousSong(mode: Bool, isOnPause: Bool) {
+        if !songParams.isRepeatModeActive {
+            let prev = songParams.actualSongIndex
+            if mode {
+                songParams.actualSongIndex = audioPlayer.nextSong(currentIndex: prev,
+                                                        hasShuffle: songParams.isShuffleModeActive,
+                                                        totalSongs: cfm.getCountFiles())
+            } else {
+                songParams.actualSongIndex = audioPlayer.prevSong(currentIndex: prev,
+                                                        hasShuffle: songParams.isShuffleModeActive,
+                                                        totalSongs: cfm.getCountFiles())
+            }
+            af.resetUIList(tableView, files: cfm.getCountFiles())
+        }
+        
+        let next = cfm.getFile(at: songParams.actualSongIndex)
+        let newSong = cfm.getURLFromDoc(of: next)
+        
+        audioPlayer.setSong(song: newSong)
+        audioPlayer.setDelegate(sender: self)
+        audioPlayer.setPlay()
+        
+        if !isOnPause {
+            setToolbarButtonsForPlayingSong(playButton: "pause.circle")
+            audioPlayer.prepareToPlay()
+            audioPlayer.play()
+        } else {
+            setToolbarButtonsForPlayingSong(playButton: "play.circle")
+        }
+        
+        audioPlayer.setSongWithParams(songParams: songParams)
+    }
+    
+    @objc private func previousSong() { goNextOrPreviousSong(mode: false, isOnPause: !audioPlayer.getIsPlaying()) }
+    
+    @objc private func nextSong() { goNextOrPreviousSong(mode: true, isOnPause: !audioPlayer.getIsPlaying()) }
+    
+    @objc private func displaySong() {
+        fromToolbarToDisplay = true
+        performSegue(withIdentifier: "goToPlaySong", sender: nil)
+    }
+    
+    // MARK: Funciones Auxiliares
+    
+    /**
+    * setToolbarManagement: Añade GestureRecognizers a la toolbar cuando una canción se está reproduciendo.
+    * Swipe a la izquierda: NextSong
+    * Swipe a la derecha: PreviousSong
+    * Tap -> Lleva a la canción que está sonando
+    */
+    private func setToolbarManagement() {
+        navigationController!.toolbar.barTintColor = UIColor.darkGray
+        
+        let swipeRight = UISwipeGestureRecognizer(target: self, action: #selector(previousSong))
+        swipeRight.direction = .right
+        let swipeLeft = UISwipeGestureRecognizer(target: self, action: #selector(nextSong))
+        swipeLeft.direction = .left
+        //let tap = UITapGestureRecognizer(target: self, action: #selector(displaySong))
+        //tap.numberOfTapsRequired = 1
+        
+        navigationController!.toolbar.addGestureRecognizer(swipeLeft)
+        navigationController!.toolbar.addGestureRecognizer(swipeRight)
+        //navigationController!.toolbar.addGestureRecognizer(tap)
+    }
+    
+    /**
+     * createCustomButton: Crea un boton o un label personalizado para la UIToolbar
+     */
+    private func createCustomButton(_ image: String?, _ title: String?, _ detail: String?) -> UIBarButtonItem {
+        if let img = image {
+            let button = UIButton(type: .custom)
+            
+            button.setBackgroundImage(UIImage(systemName: img), for: .normal)
+            button.tintColor = UIColor.white
+            
+            button.addTarget(self, action: #selector(managePlayAction), for: .touchUpInside)
+            return UIBarButtonItem.init(customView: button)
+        } else {
+            let label = UILabel()
+            
+            if title != nil {
+                label.text = title
+                label.textColor = UIColor.white
+                label.font = UIFont.boldSystemFont(ofSize: 18)
+            } else {
+                label.text = detail
+                label.textColor = UIColor(named: "Detail")
+            }
+            label.numberOfLines = 1
+            return UIBarButtonItem.init(customView: label)
+        }
+    }
+    
+    /**
+     * setToolbarButtonsForPlayingSong: Crea una customToolbar para la reproduccion de una cancion
+     */
+    private func setToolbarButtonsForPlayingSong(playButton: String) {
+        let actualSong = cfm.getFile(at: songParams.actualSongIndex)
+        let id3 = af.getAndSetDataFromID3ForToolbar(song: cfm.getURLFromDoc(of: actualSong))
+        
+        let playButton = createCustomButton(playButton, nil, nil)
+        let songToolbarText = createCustomButton(nil, id3[0] + " \u{00B7} ", nil)
+        let artistToolbarText = createCustomButton(nil, nil, id3[1])
+        let blank = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
+        
+        toolbarItems = [songToolbarText, artistToolbarText, blank, playButton]
+    }
     
     private func createAlert(isModificationMode: Bool, _ index: Int?) {
-        let alert = UIAlertController(title: "Añadir Playlist", message: nil, preferredStyle: .alert)
+        var alert: UIAlertController!
+        if isModificationMode {
+            alert = UIAlertController(title: "Modificar Playlist", message: nil, preferredStyle: .alert)
+        } else {
+            alert = UIAlertController(title: "Añadir Playlist", message: nil, preferredStyle: .alert)
+        }
         
         alert.addTextField(configurationHandler: {
             textField in

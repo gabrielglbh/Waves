@@ -14,21 +14,18 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
 
     var songToBePlayed: URL?
     var songRawName: String?
-    var actualSongIndex: Int?
     var currentSongFromList: Bool?
     
 	// Instancia única para toda la aplicación de la canción que suena
 	let ap = AudioPlayer()
 	var audioPlayer: AudioPlayer!
+    var songParams = AudioPlayer.song()
     
     var cfm = CustomFileManager()
-    var key = "music"
+    var key: String?
     
     var songTime = Timer()
     
-    var isPlaying = true
-    var isRepeatModeActive = false
-    var isShuffleModeActive = false
     var fromPlaylist = false
     
     @IBOutlet var portrait: UIImageView?
@@ -57,12 +54,13 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
      * vista de la aplicación
      */
     override func viewWillAppear(_ animated: Bool) {
-        cfm.setCFM(key: key)
+		audioPlayer = ap.getInstance()
+        songParams = audioPlayer.getSongParams()
+        
+        cfm.setCFM(key: songParams.key, isPlaylist: false)
         cfm.reloadData()
         
-		audioPlayer = ap.getInstance()
 		getAndSetDataFromID3(songToBePlayed!)
-        
         setPlayerToNewSong(songToBePlayed!, isOnPause: false, isBeingPlayedOnList: currentSongFromList!)
         
         navigationController!.navigationBar.tintColor = UIColor.systemYellow
@@ -71,6 +69,10 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
         
         setRepeatMode()
         setShuffleMode()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        audioPlayer.setSongWithParams(songParams: songParams)
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -108,9 +110,7 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
     private func setPlayerToNewSong(_ songToBePlayed: URL, isOnPause: Bool, isBeingPlayedOnList: Bool) {
         if isBeingPlayedOnList {
             initialTime?.text = convertDurationToString(duration: audioPlayer.getCurrentTime())
-            
-            songDurationSlider?.value = Float(audioPlayer.getCurrentTime())
-            
+                        
             startTimerOfSong()
         } else {
             audioPlayer.setSong(song: songToBePlayed)
@@ -127,12 +127,15 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
             }
         }
         
-        audioPlayer.setDelegate(sender: self)
         let duration = audioPlayer.getDuration()
         lastTime?.text = convertDurationToString(duration: duration)
         
         songDurationSlider?.minimumValue = 0
         songDurationSlider?.maximumValue = Float(duration)
+        
+        if isBeingPlayedOnList { songDurationSlider?.value = Float(audioPlayer.getCurrentTime()) }
+
+        audioPlayer.setDelegate(sender: self)
     }
 	
 	func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
@@ -169,7 +172,7 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
      * de play/pause
      */
     @IBAction private func playSong() {
-        if isPlaying {
+        if audioPlayer.getIsPlaying() {
             playPauseButton?.setImage(UIImage(systemName: "play.circle.fill"), for: .normal)
             audioPlayer.pause()
             songTime.invalidate()
@@ -178,7 +181,6 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
             audioPlayer.play()
             startTimerOfSong()
         }
-        isPlaying = !isPlaying
     }
     
     /**
@@ -191,24 +193,24 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
     
     // Nombre explanatorio
     @IBAction private func setRepeatMode() {
-        if isRepeatModeActive {
+        if songParams.isRepeatModeActive {
             repeatSong?.setImage(UIImage(systemName: "repeat"), for: .normal)
             repeatSong?.tintColor = .lightGray
         } else {
             repeatSong?.setImage(UIImage(systemName: "repeat.1"), for: .normal)
             repeatSong?.tintColor = .systemYellow
         }
-        isRepeatModeActive = !isRepeatModeActive
+        songParams.isRepeatModeActive = !songParams.isRepeatModeActive
     }
     
     // Nombre explanatorio
     @IBAction private func setShuffleMode() {
-        if isShuffleModeActive {
+        if songParams.isShuffleModeActive {
             shuffleSongs?.tintColor = .lightGray
         } else {
             shuffleSongs?.tintColor = .systemYellow
         }
-        isShuffleModeActive = !isShuffleModeActive
+        songParams.isShuffleModeActive = !songParams.isShuffleModeActive
     }
     
     // Nombre explanatorio
@@ -247,7 +249,7 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
         songTime.invalidate()
         songDurationSlider?.value = 0
         
-        if isRepeatModeActive {
+        if songParams.isRepeatModeActive {
             if audioPlayer.evaluateOnRepeat() {
                 initialTime?.text = "0:00"
                 startTimerOfSong()
@@ -266,18 +268,18 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
                     initialTime?.text = "0:00"
                 }
             } else {
-                let prev = actualSongIndex!
+                let prev = songParams.actualSongIndex
 				if mode {
-					actualSongIndex = audioPlayer.nextSong(currentIndex: prev,
-                                                            hasShuffle: isShuffleModeActive,
+					songParams.actualSongIndex = audioPlayer.nextSong(currentIndex: prev,
+                                                            hasShuffle: songParams.isShuffleModeActive,
                                                             totalSongs: cfm.getCountFiles())
 				} else {
-					actualSongIndex = audioPlayer.prevSong(currentIndex: prev,
-                                                            hasShuffle: isShuffleModeActive,
+					songParams.actualSongIndex = audioPlayer.prevSong(currentIndex: prev,
+                                                            hasShuffle: songParams.isShuffleModeActive,
                                                             totalSongs: cfm.getCountFiles())
                 }
                 
-                let newSong = cfm.getNextSong(from: actualSongIndex!)
+                let newSong = cfm.getNextSong(from: songParams.actualSongIndex)
                 songToBePlayed = newSong
                 
                 if hasEnded {
