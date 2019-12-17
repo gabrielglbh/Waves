@@ -212,7 +212,7 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
     
     /**
     * didSelect: Delegado de UITabBar. Actualiza la IU y la canción en función de la pulsación del boton
-    * de play/pause, y siguiente/anterior cancion
+    * de play/pause
     */
     @objc private func managePlayAction() {
         if isPlaying {

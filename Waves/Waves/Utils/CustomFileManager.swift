@@ -17,6 +17,9 @@ class CustomFileManager {
     
     init() { }
     
+	/**
+	* Iniciación de los ficheros y el UserDefaults para una key fija
+	*/
     init(key: String) {
         self.key = key
         setFiles()
@@ -28,6 +31,9 @@ class CustomFileManager {
         }
     }
     
+	/**
+	* Iniciación de los ficheros y el UserDefaults para una key dinámica
+	*/
     func setCFM(key: String) {
         self.key = key
         setFiles()
@@ -39,6 +45,9 @@ class CustomFileManager {
         }
     }
     
+	/**
+	* setFiles: Iniciación de los ficheros únicamente
+	*/
     func setFiles() {
         fm = FileManager.default
         docs = fm.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -48,6 +57,9 @@ class CustomFileManager {
         files!.removeAll { $0 == ".DS_Store" }
     }
     
+	/**
+	* reloadData: Recarga de las canciones del directorio
+	*/
     func reloadData() {
         files = try? fm.contentsOfDirectory(atPath: docs.path)
         files!.removeAll { $0 == ".DS_Store" }
@@ -65,6 +77,11 @@ class CustomFileManager {
         return files![at]
     }
     
+	/**
+	* getFileFrom: Funcion para recuperar una cancion de los documentos, dentro 
+	* de una playlist para asociarla a ella.
+	* Devuelve el nombre del fichero elegido.
+	*/
     func getFileFrom(at: Int, from: String) -> String {
         setCFM(key: from)
         let file = getFile(at: at)
@@ -76,11 +93,17 @@ class CustomFileManager {
         return docs.appendingPathComponent(of)
     }
     
+	/**
+	* getNextSong: Devuelve la URL del directorio para una cancion
+	*/
     func getNextSong(from: Int) -> URL {
         let next = getFile(at: from)
         return getURLFromDoc(of: next)
     }
     
+	/**
+	* removeInstance: Eliminar una cancion de los documentos y de los UserDefaults
+	*/
     func removeInstance(songToBeRemoved: String) {
         let path = docs.appendingPathComponent(songToBeRemoved)
         do {
@@ -88,13 +111,16 @@ class CustomFileManager {
         } catch { print("Error al eliminar") }
         
         files = try? fm.contentsOfDirectory(atPath: docs.path)
-        UserDefaults.standard.set(files!, forKey: key)
+        setUserDefaults(files)
     }
     
+	/**
+	* updateInstance: Actualizar una cancion en los documentos y en los UserDefaults
+	*/
     func updateInstance(from: Int, to: Int) {
         let song = files!.remove(at: from)
         files!.insert(song, at: to)
-        UserDefaults.standard.set(files!, forKey: key)
+        setUserDefaults(files)
     }
     
     func setUserDefaults(files: [String]) {
