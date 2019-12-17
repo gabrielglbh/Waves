@@ -71,10 +71,10 @@ class AuxiliarFunctions {
         for item in metadataList {
             switch item.commonKey!.rawValue {
                 case "title":
-                    id3_fields.append(item.value as? String)
+                    id3_fields.append((item.value as? String)!)
                     break
                 case "artist":
-                    id3_fields.append(item.value as? String)
+                    id3_fields.append((item.value as? String)!)
                     break
                 default:
                     break

@@ -111,7 +111,7 @@ class CustomFileManager {
         } catch { print("Error al eliminar") }
         
         files = try? fm.contentsOfDirectory(atPath: docs.path)
-        setUserDefaults(files)
+        setUserDefaults(files: files!)
     }
     
 	/**
@@ -120,7 +120,7 @@ class CustomFileManager {
     func updateInstance(from: Int, to: Int) {
         let song = files!.remove(at: from)
         files!.insert(song, at: to)
-        setUserDefaults(files)
+        setUserDefaults(files: files!)
     }
     
     func setUserDefaults(files: [String]) {

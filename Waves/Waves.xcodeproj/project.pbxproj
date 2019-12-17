@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C0086BF023A91B1C00FB9178 /* CustomToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0086BEF23A91B1C00FB9178 /* CustomToolbar.swift */; };
 		C02218E52397246A00B86FE4 /* LyricsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C02218E42397246A00B86FE4 /* LyricsViewController.swift */; };
 		C0246F7A23A590B900407E59 /* SelectSongsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0246F7923A590B900407E59 /* SelectSongsController.swift */; };
 		C03B982C2384620E00B8B0D3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C03B982B2384620E00B8B0D3 /* AppDelegate.swift */; };
@@ -25,6 +26,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		C0086BEF23A91B1C00FB9178 /* CustomToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomToolbar.swift; sourceTree = "<group>"; };
 		C02218E42397246A00B86FE4 /* LyricsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LyricsViewController.swift; sourceTree = "<group>"; };
 		C0246F7923A590B900407E59 /* SelectSongsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectSongsController.swift; sourceTree = "<group>"; };
 		C03B98282384620E00B8B0D3 /* Waves.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Waves.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -112,6 +114,7 @@
 				C0CE181B23A28917000118D4 /* AudioPlayer.swift */,
 				C06077F123A5A46F008C1835 /* CustomFileManager.swift */,
 				C079E29923A827DC00ED8C95 /* AuxiliarFunctions.swift */,
+				C0086BEF23A91B1C00FB9178 /* CustomToolbar.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -206,6 +209,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C02218E52397246A00B86FE4 /* LyricsViewController.swift in Sources */,
+				C0086BF023A91B1C00FB9178 /* CustomToolbar.swift in Sources */,
 				C0FF705223A1B1F6000F5316 /* PlayListListController.swift in Sources */,
 				C079E29A23A827DC00ED8C95 /* AuxiliarFunctions.swift in Sources */,
 				C0CE181C23A28917000118D4 /* AudioPlayer.swift in Sources */,

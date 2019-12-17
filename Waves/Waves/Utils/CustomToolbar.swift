@@ -9,22 +9,20 @@
 import UIKit
 
 class CustomToolbar {
-	let af = AuxiliarFuntions()
-	var fromToolbarToDisplay: Bool?
+    let af = AuxiliarFuntions()
+    var fromToolbarToDisplay: Bool?
 
-	/**
+    /**
     * Añade GestureRecognizers a la toolbar cuando una canción se está reproduciendo.
     * Swipe a la izquierda: NextSong
     * Swipe a la derecha: PreviousSong
     * Tap -> Lleva a la canción que está sonando
     */
-	// MARK: TODO: Parámetros para los #selector -> audioPlayer (previousSong y nextSong)
-	// Utilizar un custom UISwipeGestureRecognizer que tenga como parametro el audioPlayer
-	// https://stackoverflow.com/questions/43251708/passing-arguments-to-selector-in-swift
-	init(_ navigationController: UINavigationController) { 
-		fromToolbarToDisplay = false
-	
-		navigationController.toolbar.barTintColor = UIColor.darkGray
+    // MARK: TODO: Parámetros para los #selector -> audioPlayer (previousSong y nextSong)
+    init(_ navigationController: UINavigationController) {
+        fromToolbarToDisplay = false
+    
+        navigationController.toolbar.barTintColor = UIColor.darkGray
         
         let swipeRight = UISwipeGestureRecognizer(target: self, action: #selector(previousSong))
         swipeRight.direction = .right
@@ -36,30 +34,30 @@ class CustomToolbar {
         navigationController.toolbar.addGestureRecognizer(swipeLeft)
         navigationController.toolbar.addGestureRecognizer(swipeRight)
         navigationController.toolbar.addGestureRecognizer(tap)
-	}
-	
-	@objc private func previousSong(audioPlayer: AudioPlayer) { 
-		goNextOrPreviousSong(mode: false, isOnPause: !audioPlayer.getIsPlaying()) 
-	}
+    }
     
-    @objc private func nextSong(audioPlayer: AudioPlayer) { 
-		goNextOrPreviousSong(mode: true, isOnPause: !audioPlayer.getIsPlaying()) 
-	}
+    @objc private func previousSong(audioPlayer: AudioPlayer) {
+        goNextOrPreviousSong(mode: false, isOnPause: !audioPlayer.getIsPlaying())
+    }
+    
+    @objc private func nextSong(audioPlayer: AudioPlayer) {
+        goNextOrPreviousSong(mode: true, isOnPause: !audioPlayer.getIsPlaying())
+    }
     
     @objc private func displaySong() {
         setFromToolbarToDisplay(true)
         performSegue(withIdentifier: "goToPlaySong", sender: nil)
     }
-	
-	func getFromToolbarToDisplay() -> Bool {
-		return fromToolbarToDisplay!
-	}
-	
-	func setFromToolbarToDisplay(_ val: Bool) {
-		fromToolbarToDisplay = val
-	}
-	
-	/**
+    
+    func getFromToolbarToDisplay() -> Bool {
+        return fromToolbarToDisplay!
+    }
+    
+    func setFromToolbarToDisplay(_ val: Bool) {
+        fromToolbarToDisplay = val
+    }
+    
+    /**
     * managePlayAction: Actualiza la IU y la canción en función de la pulsación del boton
     * de play/pause.
     */
@@ -73,15 +71,15 @@ class CustomToolbar {
         }
         isPlaying = !isPlaying
     }
-	
-	/**
-	* goNextOrPreviousSong: Maneja todos los indices para calcular la siguiente cancion
-	* en funcion de los modos de repetición y aleatorio.
-	* Devuelve el indice actualizado de la cancion que va a sonar.
-	*/
-	func goNextOrPreviousSong(_ fileManager: CustomFileManager, _ audioPlayer: AudioPlayer, mode: Bool, 
-							isOnPause: Bool, repeatMode: Bool, shuffleMode: Bool, songIndex: Int) -> Int {
-		var index = songIndex
+    
+    /**
+    * goNextOrPreviousSong: Maneja todos los indices para calcular la siguiente cancion
+    * en funcion de los modos de repetición y aleatorio.
+    * Devuelve el indice actualizado de la cancion que va a sonar.
+    */
+    func goNextOrPreviousSong(_ fileManager: CustomFileManager, _ audioPlayer: AudioPlayer, mode: Bool,
+                            isOnPause: Bool, repeatMode: Bool, shuffleMode: Bool, songIndex: Int) -> Int {
+        var index = songIndex
         if !repeatMode {
             let prev = index
             if mode {
@@ -111,15 +109,15 @@ class CustomToolbar {
         } else {
             setToolbarButtonsForPlayingSong(playButton: "play.circle")
         }
-		
-		return index
+        
+        return index
     }
-	
-	func setToolbarVisibility(_ navigationController: UINavigationController, visible: Bool) {
-		navigationController.isToolbarHidden = visible
-	}
-	
-	/**
+    
+    func setToolbarVisibility(_ navigationController: UINavigationController, visible: Bool) {
+        navigationController.isToolbarHidden = visible
+    }
+    
+    /**
      * createCustomButton: Crea un boton o un label personalizado para la UIToolbar
      */
     func createCustomButton(_ image: String?, _ title: String?, _ detail: String?) -> UIBarButtonItem {
@@ -151,8 +149,8 @@ class CustomToolbar {
      * setToolbarButtonsForPlayingSong: Crea una customToolbar para la reproduccion de una cancion
      */
     func setToolbarButtonsForPlayingSong(_ navigationController: UINavigationController, song: URL, playButton: String) {
-		let fields = af.getAndSetDataFromID3ForToolbar(song)
-	
+        let fields = af.getAndSetDataFromID3ForToolbar(song)
+    
         let playButton = createCustomButton(playButton, nil, nil)
         let songToolbarText = createCustomButton(nil, fields[0] + " \u{00B7} ", nil)
         let artistToolbarText = createCustomButton(nil, nil, fields[1])
