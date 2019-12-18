@@ -22,7 +22,7 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
     var songParams = AudioPlayer.song()
     
     var cfm = CustomFileManager()
-    var key: String?
+    var key: String!
     
     var songTime = Timer()
     
@@ -40,25 +40,20 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
     
     @IBOutlet var songDurationSlider: UISlider?
     
-    /**
-     * viewDidLoad: Se crea la URL para acceder a las canciones y se agranda en altura la progress bar.
-     * Se crean los manejadores para la LockScreen y el Control Center de iOS para la cancion
-     */
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Waves"
     }
     
     /**
-     * viewWillAppear: Se inicializa la variable player para reproducir la canción pasada por segue dse la anterior
-     * vista de la aplicación
+     * viewWillAppear: Se inicializa el singleton del audioPlayer y los ficheros de musica
      */
     override func viewWillAppear(_ animated: Bool) {
 		audioPlayer = ap.getInstance()
         songParams = audioPlayer.getSongParams()
         
+        key = songParams.key
         cfm.setCFM(key: songParams.key, isPlaylist: false)
-        cfm.reloadData()
+        cfm.reloadData(key: key)
         
 		getAndSetDataFromID3(songToBePlayed!)
         setPlayerToNewSong(songToBePlayed!, isOnPause: false, isBeingPlayedOnList: currentSongFromList!)

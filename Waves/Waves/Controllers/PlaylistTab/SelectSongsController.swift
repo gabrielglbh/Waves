@@ -23,7 +23,6 @@ class SelectSongsController: UITableViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        // MARK: TODO - No se recogen todas las canciones del archivo al hacer set de una playlist
         cfm.setAllFiles()
         cfm.checkUserDefaults(key: "music")
         
@@ -58,7 +57,9 @@ class SelectSongsController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
+        let selectedCell = tableView.cellForRow(at: indexPath)
+        selectedCell?.accessoryType = .checkmark
+        // MARK: TODO: Change color of selected row
         selectedSongs.append(indexPath.row)
     }
     

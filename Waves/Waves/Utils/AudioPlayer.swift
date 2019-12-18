@@ -26,6 +26,9 @@ class AudioPlayer {
     private var player: AVAudioPlayer!
     private var songParams = song()
 	
+    /**
+     * Recoge la instancia única del player
+     */
 	func getInstance() -> AudioPlayer {
         return AudioPlayer.sharedInstance
 	}
@@ -73,32 +76,6 @@ class AudioPlayer {
         self.player.stop()
     }
 	
-	func nextSong(currentIndex: Int, hasShuffle: Bool, totalSongs: Int) -> Int {
-        var ind = currentIndex
-		if hasShuffle { 
-			return Int.random(in: 0 ..< totalSongs) 
-		} else {
-			ind += 1
-			if ind == totalSongs {
-				ind = 0
-			}
-			return ind
-		}
-	}
-	
-	func prevSong(currentIndex: Int, hasShuffle: Bool, totalSongs: Int) -> Int {
-        var ind = currentIndex
-		if hasShuffle { 
-			return Int.random(in: 0 ..< totalSongs) 
-		} else {
-			ind -= 1
-			if ind == -1 {
-				ind = totalSongs - 1
-			}
-			return ind
-		}
-	}
-	
 	func getCurrentTime() -> Double {
 		return self.player.currentTime
 	}
@@ -119,6 +96,41 @@ class AudioPlayer {
 		self.player.currentTime = at
 	}
 	
+    /**
+    * Actualiza el índice de la siguiente canción en función de hasShuffle
+    */
+    func nextSong(currentIndex: Int, hasShuffle: Bool, totalSongs: Int) -> Int {
+        var ind = currentIndex
+        if hasShuffle {
+            return Int.random(in: 0 ..< totalSongs)
+        } else {
+            ind += 1
+            if ind == totalSongs {
+                ind = 0
+            }
+            return ind
+        }
+    }
+    
+    /**
+    * Actualiza el índice de la anterior canción en función de hasShuffle
+    */
+    func prevSong(currentIndex: Int, hasShuffle: Bool, totalSongs: Int) -> Int {
+        var ind = currentIndex
+        if hasShuffle {
+            return Int.random(in: 0 ..< totalSongs)
+        } else {
+            ind -= 1
+            if ind == -1 {
+                ind = totalSongs - 1
+            }
+            return ind
+        }
+    }
+    
+    /**
+    * Evalua la repetición de la canción en función de is está sonando o no
+    */
 	func evaluateOnRepeat() -> Bool {
 		if self.player.isPlaying {
 			setCurrentTime(at: 0)

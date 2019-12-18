@@ -20,7 +20,7 @@ class AuxiliarFunctions {
     }
     
     /**
-     * setCurrentSongUI: Actualiza la celda elegida de la cancion que está sonando y la pinta de amarillo
+     * Actualiza la celda elegida de la cancion que está sonando y la pinta de amarillo
      */
     func setCurrentSongUI(_ tableView: UITableView, at: Int) -> UITableViewCell? {
         let cellOfPlayingSong = tableView.cellForRow(at: IndexPath(row: at, section: 0))
@@ -30,7 +30,7 @@ class AuxiliarFunctions {
     }
 
     /**
-    * getAndSetDataFromID3: Recoge la información de metadatos ID3 de cada canción y popula la celda
+    * Recoge la información de metadatos ID3 de cada canción y popula la celda
     */
     func getAndSetDataFromID3(song: URL, cell: UITableViewCell?) {
         let p = AVPlayerItem(url: song)
@@ -60,8 +60,7 @@ class AuxiliarFunctions {
     }
     
     /**
-     * getAndSetDataFromID3ForToolbar: Recoge la información de metadatos ID3 de la canción que está sonando
-     * para poner los campos de la toolbar
+     * Recoge la información de metadatos ID3 de la canción que está sonando para poner los campos de la toolbar
      */
     func getAndSetDataFromID3ForToolbar(song: URL) -> [String] {
         let p = AVPlayerItem(url: song)

@@ -28,10 +28,6 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
     var songToolbarText: UIBarButtonItem!
     var cellOfPlayingSong: UITableViewCell?
         
-    /**
-     * viewDidLoad: Crea un fichero en UsersDefault para mantener el orden de la lista en caso de que haya cambiado
-     * Obtiene el path a los ficheros de música.
-     */
     override func viewDidLoad() {
         super.viewDidLoad()
         self.navigationItem.rightBarButtonItem = self.editButtonItem
@@ -39,10 +35,13 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
         
         self.title = "Mis Canciones"
         
-        cfm.reloadData()
+        cfm.reloadData(key: key)
         tableView.reloadData()
     }
     
+    /**
+     * viewWillAppear: Se inicializa el singleton del audioPlayer y los ficheros de musica. Se checkea si hay toolbar o no.
+     */
     override func viewWillAppear(_ animated: Bool) {
 		audioPlayer = ap.getInstance()
         songParams = audioPlayer.getSongParams()
@@ -106,7 +105,7 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
             }
             
             let songToBeRemoved = cfm.getFile(at: indexPath.row)
-            cfm.removeInstance(songToBeRemoved: songToBeRemoved)
+            cfm.removeInstance(songToBeRemoved: songToBeRemoved, key: key)
             
             tableView.deleteRows(at: [indexPath], with: .fade)
         }
@@ -116,7 +115,7 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
      * moveRowAt: Al mover una cancion se actualizan los indices
      */
     override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-        cfm.updateInstance(from: fromIndexPath.row, to: to.row)
+        cfm.updateInstance(from: fromIndexPath.row, to: to.row, key: key)
         songParams.actualSongIndex = to.row
         audioPlayer.setSongWithParams(songParams: songParams)
     }
@@ -158,7 +157,7 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
         dictionary.keys.forEach { key in
             defaults.removeObject(forKey: key)
         }
-        cfm.reloadData()
+        cfm.reloadData(key: key)
         tableView.reloadData()
     }
     

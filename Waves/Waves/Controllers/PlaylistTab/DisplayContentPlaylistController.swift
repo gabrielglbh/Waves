@@ -19,6 +19,7 @@ class DisplayContentPlaylistController: UITableViewController, AVAudioPlayerDele
     let ap = AudioPlayer()
     var audioPlayer: AudioPlayer!
     var songParams = AudioPlayer.song()
+    var key: String!
     
     let af = AuxiliarFunctions()
     
@@ -37,6 +38,9 @@ class DisplayContentPlaylistController: UITableViewController, AVAudioPlayerDele
         self.navigationItem.rightBarButtonItems = [self.editButtonItem, add]
     }
     
+    /**
+    * viewWillAppear: Se inicializa el singleton del audioPlayer y los ficheros de musica relativa a la playlist con el UserDefaults
+    */
     override func viewWillAppear(_ animated: Bool) {
         audioPlayer = ap.getInstance()
         songParams = audioPlayer.getSongParams()
@@ -44,7 +48,8 @@ class DisplayContentPlaylistController: UITableViewController, AVAudioPlayerDele
         navigationController!.navigationBar.tintColor = UIColor.systemYellow
         navigationController!.navigationBar.barTintColor = UIColor.darkGray
         
-        cfm.setCFM(key: title!, isPlaylist: true)
+        key = title!
+        cfm.setCFM(key: key, isPlaylist: true)
         newPlaylist = cfm.getFiles()
         
         setToolbarManagement()
@@ -87,7 +92,7 @@ class DisplayContentPlaylistController: UITableViewController, AVAudioPlayerDele
             }
             
             let songToBeRemoved = cfm.getFile(at: indexPath.row)
-            cfm.removeInstance(songToBeRemoved: songToBeRemoved)
+            cfm.removeInstance(songToBeRemoved: songToBeRemoved, key: key)
             
             tableView.deleteRows(at: [indexPath], with: .fade)
         }
@@ -97,7 +102,7 @@ class DisplayContentPlaylistController: UITableViewController, AVAudioPlayerDele
      * moveRowAt: Al mover una cancion se actualizan los indices
      */
     override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-        cfm.updateInstance(from: fromIndexPath.row, to: to.row)
+        cfm.updateInstance(from: fromIndexPath.row, to: to.row, key: key)
         songParams.actualSongIndex = to.row
         audioPlayer.setSongWithParams(songParams: songParams)
     }
@@ -134,22 +139,6 @@ class DisplayContentPlaylistController: UITableViewController, AVAudioPlayerDele
     }
     
     /**
-     * unwindToDisplayPlaylist: Recupera las canciones seleccionadas
-     */
-    @IBAction func unwindToDisplayPlaylist(_ unwind: UIStoryboardSegue) {
-        let view = unwind.source as! SelectSongsController
-        
-        for ind in view.selectedSongs {
-            newPlaylist.append(cfm.getFileFrom(at: ind, from: "music"))
-        }
-        
-        // MARK: TODO - No se recogen de UserDefaults al salir de la playlist
-        cfm.setFiles(newPlaylist)
-        cfm.setUserDefaults(files: newPlaylist)
-        tableView.reloadData()
-    }
-    
-    /**
      * unwindToPlaylist: Dos caminos posibles:
      *          1. Al volver de la preview de la cancion, recoge si hay alguna cancion reproduciendose. Si la hay,
      *              se actualizará la IU y se hace set del nuevo delegado de la vista.
@@ -171,10 +160,11 @@ class DisplayContentPlaylistController: UITableViewController, AVAudioPlayerDele
             }
         } else if let view = unwind.source as? SelectSongsController {
             for ind in view.selectedSongs {
-                newPlaylist.append(cfm.getFileFrom(at: ind, from: "music"))
+                newPlaylist.append(cfm.getFileFrom(at: ind, from: "music", resetAt: key))
             }
         
-            cfm.setUserDefaults(files: newPlaylist)
+            cfm.setFiles(newPlaylist)
+            cfm.setUserDefaults(files: newPlaylist, key: title!)
             tableView.reloadData()
         }
     }
@@ -342,7 +332,7 @@ class DisplayContentPlaylistController: UITableViewController, AVAudioPlayerDele
      * setToolbarButtonsForPlayingSong: Crea una customToolbar para la reproduccion de una cancion
      */
     private func setToolbarButtonsForPlayingSong(playButton: String) {
-        let actualSong = cfm.getFileFrom(at: songParams.actualSongIndex, from: songParams.key)
+        let actualSong = cfm.getFileFrom(at: songParams.actualSongIndex, from: songParams.key, resetAt: key)
         let id3 = af.getAndSetDataFromID3ForToolbar(song: cfm.getURLFromDoc(of: actualSong))
         
         let playButton = createCustomButton(playButton, nil, nil)

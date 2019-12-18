@@ -28,6 +28,9 @@ class PlayListListController: UITableViewController, AVAudioPlayerDelegate {
     var playButton: UIBarButtonItem!
     var songToolbarText: UIBarButtonItem!
 
+    /**
+    * viewDidLoad: Se añaden los botones de Edit y + en la esquina superior derecha y se inicializan el UserDefaults de la playlists.
+    */
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -45,6 +48,9 @@ class PlayListListController: UITableViewController, AVAudioPlayerDelegate {
         }
     }
     
+    /**
+    * viewWillAppear: Se inicializa el singleton del audioPlayer y los ficheros de musica. Se checkea si hay toolbar o no.
+    */
     override func viewWillAppear(_ animated: Bool) {
         audioPlayer = ap.getInstance()
         songParams = audioPlayer.getSongParams()
@@ -78,7 +84,7 @@ class PlayListListController: UITableViewController, AVAudioPlayerDelegate {
     }
 
     /**
-     * Se añade un gestureRecognizer a cada celda para poder modificar su nombre
+     * Se añade un gestureRecognizer a cada celda para poder modificar su contenido
      */
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "CellPlaylist", for: indexPath)
