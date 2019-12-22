@@ -71,7 +71,7 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == "loadLyrics" {
+        if segue.identifier == "loadLyrics" || segue.identifier == "loadLyricsPlaylist" {
             if (segue.destination.view != nil) {
                 let view = (segue.destination as! LyricsViewController)
                 
@@ -79,7 +79,7 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
                 if let l = p.asset.lyrics {
                     view.lyrics?.text = l
                 } else {
-                    view.lyrics?.text = "No se han encontrado lyrics ;("
+                    view.lyrics?.text = NSLocalizedString("nolyricsfound.displaysongcontroller", comment: "")
                 }
             }
         }
@@ -130,6 +130,7 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
         
         if isBeingPlayedOnList { songDurationSlider?.value = Float(audioPlayer.getCurrentTime()) }
 
+        songParams.title = songName!.text! + ".mp3"
         audioPlayer.setDelegate(sender: self)
     }
 	
@@ -266,24 +267,22 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
                 let prev = songParams.actualSongIndex
 				if mode {
 					songParams.actualSongIndex = audioPlayer.nextSong(currentIndex: prev,
-                                                            hasShuffle: songParams.isShuffleModeActive,
-                                                            totalSongs: cfm.getCountFiles())
+                                                            hasShuffle: songParams.isShuffleModeActive)
 				} else {
 					songParams.actualSongIndex = audioPlayer.prevSong(currentIndex: prev,
-                                                            hasShuffle: songParams.isShuffleModeActive,
-                                                            totalSongs: cfm.getCountFiles())
+                                                            hasShuffle: songParams.isShuffleModeActive)
                 }
                 
                 let newSong = cfm.getNextSong(from: songParams.actualSongIndex)
                 songToBePlayed = newSong
+                getAndSetDataFromID3(newSong)
                 
                 if hasEnded {
                     setPlayerToNewSong(newSong, isOnPause: false, isBeingPlayedOnList: false)
                 } else {
                     setPlayerToNewSong(newSong, isOnPause: !audioPlayer.getIsPlaying(), isBeingPlayedOnList: false)
                 }
-                getAndSetDataFromID3(newSong)
-                
+    
                 songName?.font = UIFont.boldSystemFont(ofSize: 23)
             }
         }

@@ -1,0 +1,96 @@
+
+/* Class = "UILabel"; text = "17:21"; ObjectID = "29Z-In-qoJ"; */
+"29Z-In-qoJ.text" = "17:21";
+
+/* Class = "UINavigationItem"; title = "Root View Controller"; ObjectID = "6Qe-BH-XhO"; */
+"6Qe-BH-XhO.title" = "Root View Controller";
+
+/* Class = "UIBarButtonItem"; title = "Atrás"; ObjectID = "6ZZ-x9-PjB"; */
+"6ZZ-x9-PjB.title" = "Atrás";
+
+/* Class = "UIButton"; normalTitle = "Lyrics"; ObjectID = "71P-bE-uCS"; */
+"71P-bE-uCS.normalTitle" = "Letras";
+
+/* Class = "UILabel"; text = "17:21"; ObjectID = "7Mh-a1-yDK"; */
+"7Mh-a1-yDK.text" = "17:21";
+
+/* Class = "UIBarButtonItem"; title = "Item"; ObjectID = "9lo-yD-9p3"; */
+"9lo-yD-9p3.title" = "Item";
+
+/* Class = "UINavigationItem"; title = "Root View Controller"; ObjectID = "AQE-GA-oS9"; */
+"AQE-GA-oS9.title" = "Root View Controller";
+
+/* Class = "UITextView"; text = "Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. \n\nDuis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. \n\nUt enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda."; ObjectID = "F2u-au-nCT"; */
+"F2u-au-nCT.text" = "Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. \n\nDuis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. \n\nUt enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "FBy-EM-FQu"; */
+"FBy-EM-FQu.text" = "Label";
+
+/* Class = "UITabBarItem"; title = "Canciones"; ObjectID = "Gdy-IB-jXL"; */
+"Gdy-IB-jXL.title" = "Canciones";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "HKL-bn-33V"; */
+"HKL-bn-33V.text" = "Label";
+
+/* Class = "UIBarButtonItem"; title = "Guardar"; ObjectID = "HwK-f4-bi8"; */
+"HwK-f4-bi8.title" = "Guardar";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "JaL-af-B9r"; */
+"JaL-af-B9r.text" = "Title";
+
+/* Class = "UILabel"; text = "5:32"; ObjectID = "KYs-XF-dFm"; */
+"KYs-XF-dFm.text" = "5:32";
+
+/* Class = "UILabel"; text = "Subtitle"; ObjectID = "N9R-Lp-LNl"; */
+"N9R-Lp-LNl.text" = "Subtitle";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "ND8-pV-CGX"; */
+"ND8-pV-CGX.text" = "Title";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "QYy-Jx-vJD"; */
+"QYy-Jx-vJD.text" = "Title";
+
+/* Class = "UILabel"; text = "Subtitle"; ObjectID = "VQd-Wt-Qm8"; */
+"VQd-Wt-Qm8.text" = "Subtitle";
+
+/* Class = "UITabBarItem"; title = "Listas"; ObjectID = "YKO-pj-kC2"; */
+"YKO-pj-kC2.title" = "Listas";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "ZYh-fq-zws"; */
+"ZYh-fq-zws.text" = "Label";
+
+/* Class = "UIBarButtonItem"; title = "Add"; ObjectID = "ajj-sS-dG4"; */
+"ajj-sS-dG4.title" = "Añadir";
+
+/* Class = "UIBarButtonItem"; title = "Atrás"; ObjectID = "bXC-Zz-ZId"; */
+"bXC-Zz-ZId.title" = "Atrás";
+
+/* Class = "UIBarButtonItem"; title = "Lyrics"; ObjectID = "bxK-s7-hfI"; */
+"bxK-s7-hfI.title" = "Letras";
+
+/* Class = "UILabel"; text = "Subtitle"; ObjectID = "e2c-vD-xfn"; */
+"e2c-vD-xfn.text" = "Subtitle";
+
+/* Class = "UIButton"; normalTitle = "Lyrics"; ObjectID = "gri-zN-UoD"; */
+"gri-zN-UoD.normalTitle" = "Letras";
+
+/* Class = "UILabel"; text = "5:32"; ObjectID = "ih1-9g-jDc"; */
+"ih1-9g-jDc.text" = "5:32";
+
+/* Class = "UIBarButtonItem"; title = "Reset"; ObjectID = "noZ-mj-DVi"; */
+"noZ-mj-DVi.title" = "Reset";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "ord-Bf-3zi"; */
+"ord-Bf-3zi.text" = "Title";
+
+/* Class = "UINavigationItem"; title = "Root View Controller"; ObjectID = "qXv-ft-9L9"; */
+"qXv-ft-9L9.title" = "Root View Controller";
+
+/* Class = "UINavigationItem"; title = "Root View Controller"; ObjectID = "rOK-u2-Qhh"; */
+"rOK-u2-Qhh.title" = "Root View Controller";
+
+/* Class = "UIBarButtonItem"; title = "Lyrics"; ObjectID = "t6k-5b-iYn"; */
+"t6k-5b-iYn.title" = "Letras";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "zdL-1K-Cgx"; */
+"zdL-1K-Cgx.text" = "Label";

@@ -1,0 +1,25 @@
+/* 
+  Localizable.strings
+  Waves
+
+  Created by Gabriel Garcia on 22/12/2019.
+  Copyright © 2019 Gabriel. All rights reserved.
+*/
+
+"title.songlistcontroller" = "Songs";
+
+"nolyricsfound.displaysongcontroller" = "Lyrics not found ;(";
+
+"selectsongs.selecsongscontroller" = "Select Songs";
+
+"editButtontitle" = "Edit";
+
+"title.playlistlistcontroller" = "Playlists";
+
+"titlealert.modify" = "Modify Playlist";
+
+"titlealert.add" = "Add Playlist";
+
+"placeholder.alert" = "Name";
+
+"backbutton.alert" = "Back";

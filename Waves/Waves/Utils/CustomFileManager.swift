@@ -43,7 +43,6 @@ class CustomFileManager {
     func setAllFiles() {
         fm = FileManager.default
         docs = fm.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        print(docs.path)
         
         files = try! fm.contentsOfDirectory(atPath: docs.path)
         files.removeAll { $0 == ".DS_Store" }
@@ -139,5 +138,9 @@ class CustomFileManager {
     func getNextSong(from: Int) -> URL {
         let next = getFile(at: from)
         return getURLFromDoc(of: next)
+    }
+    
+    func printDocsPath() {
+        print(docs.path)
     }
 }

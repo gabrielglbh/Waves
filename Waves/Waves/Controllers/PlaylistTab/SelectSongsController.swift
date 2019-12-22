@@ -19,7 +19,7 @@ class SelectSongsController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.title = "Elige Canciones"
+        self.title = NSLocalizedString("selectsongs.selecsongscontroller", comment: "")
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -58,13 +58,13 @@ class SelectSongsController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let selectedCell = tableView.cellForRow(at: indexPath)
-        selectedCell?.accessoryType = .checkmark
-        // MARK: TODO: Change color of selected row
+        selectedCell?.contentView.backgroundColor = UIColor.darkGray
         selectedSongs.append(indexPath.row)
     }
     
     override func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
-        tableView.cellForRow(at: indexPath)?.accessoryType = .none
+        let selectedCell = tableView.cellForRow(at: indexPath)
+        selectedCell?.contentView.backgroundColor = UIColor.init(red: 111, green: 113, blue: 121, alpha: 0)
         for (ind, row) in selectedSongs.enumerated() {
             if row == indexPath.row {
                 selectedSongs.remove(at: ind)

@@ -21,6 +21,10 @@ class AudioPlayer {
         var actualSongIndex = 0
         var isShuffleModeActive = false
         var isRepeatModeActive = false
+        var title = ""
+        // Variable que delimita el numero de canciones máximas en la playlist/biblioteca desde donde
+        //  está sonando la canción
+        var maxIndexSongs = 1
     }
     static var sharedInstance = AudioPlayer()
     private var player: AVAudioPlayer!
@@ -38,6 +42,8 @@ class AudioPlayer {
         self.songParams.actualSongIndex = songParams.actualSongIndex
         self.songParams.isShuffleModeActive = songParams.isShuffleModeActive
         self.songParams.isRepeatModeActive = songParams.isRepeatModeActive
+        self.songParams.title = songParams.title
+        self.songParams.maxIndexSongs = songParams.maxIndexSongs
     }
     
     func getSongParams() -> song {
@@ -99,13 +105,13 @@ class AudioPlayer {
     /**
     * Actualiza el índice de la siguiente canción en función de hasShuffle
     */
-    func nextSong(currentIndex: Int, hasShuffle: Bool, totalSongs: Int) -> Int {
+    func nextSong(currentIndex: Int, hasShuffle: Bool) -> Int {
         var ind = currentIndex
         if hasShuffle {
-            return Int.random(in: 0 ..< totalSongs)
+            return Int.random(in: 0 ..< songParams.maxIndexSongs)
         } else {
             ind += 1
-            if ind == totalSongs {
+            if ind == songParams.maxIndexSongs {
                 ind = 0
             }
             return ind
@@ -115,14 +121,14 @@ class AudioPlayer {
     /**
     * Actualiza el índice de la anterior canción en función de hasShuffle
     */
-    func prevSong(currentIndex: Int, hasShuffle: Bool, totalSongs: Int) -> Int {
+    func prevSong(currentIndex: Int, hasShuffle: Bool) -> Int {
         var ind = currentIndex
         if hasShuffle {
-            return Int.random(in: 0 ..< totalSongs)
+            return Int.random(in: 0 ..< songParams.maxIndexSongs)
         } else {
             ind -= 1
             if ind == -1 {
-                ind = totalSongs - 1
+                ind = songParams.maxIndexSongs - 1
             }
             return ind
         }

@@ -11,6 +11,8 @@ import AVFoundation
 
 class AuxiliarFunctions {
     
+    let cfm = CustomFileManager()
+    
     func resetUIList(_ tableView: UITableView, files: Int) {
         for song in 0...files {
             let cell = tableView.cellForRow(at: IndexPath(row: song, section: 0))
@@ -22,12 +24,18 @@ class AuxiliarFunctions {
     /**
      * Actualiza la celda elegida de la cancion que está sonando y la pinta de amarillo
      */
-    func setCurrentSongUI(_ tableView: UITableView, at: Int) -> UITableViewCell? {
-        let cellOfPlayingSong = tableView.cellForRow(at: IndexPath(row: at, section: 0))
+    /*func setCurrentSongUI(_ tableView: UITableView, song: AudioPlayer.song) {
+        var realInd = 0
+        for (ind, cell) in tableView.visibleCells.enumerated() {
+            if cell.textLabel!.text! + ".mp3" == song.title {
+                realInd = ind
+            }
+        }
+        
+        let cellOfPlayingSong = tableView.cellForRow(at: IndexPath(row: realInd, section: 0))
         cellOfPlayingSong?.textLabel?.textColor = UIColor.systemYellow
         cellOfPlayingSong?.detailTextLabel?.textColor = UIColor.systemYellow
-        return cellOfPlayingSong
-    }
+    }*/
 
     /**
     * Recoge la información de metadatos ID3 de cada canción y popula la celda

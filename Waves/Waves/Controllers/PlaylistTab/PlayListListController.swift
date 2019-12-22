@@ -23,8 +23,6 @@ class PlayListListController: UITableViewController, AVAudioPlayerDelegate {
     
     let af = AuxiliarFunctions()
     
-    var fromToolbarToDisplay = false
-    
     var playButton: UIBarButtonItem!
     var songToolbarText: UIBarButtonItem!
 
@@ -36,10 +34,11 @@ class PlayListListController: UITableViewController, AVAudioPlayerDelegate {
         
         let add = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addPlaylist))
         self.editButtonItem.tintColor = UIColor.systemYellow
+        self.editButtonItem.title = NSLocalizedString("editButtontitle", comment: "")
         add.tintColor = UIColor.systemYellow
         self.navigationItem.rightBarButtonItems = [self.editButtonItem, add]
         
-        title = "Mis Listas"
+        title = NSLocalizedString("title.playlistlistcontroller", comment: "")
         
         if UserDefaults.standard.object(forKey: "playlists") == nil {
             UserDefaults.standard.set(playlists, forKey: "playlists")
@@ -63,6 +62,7 @@ class PlayListListController: UITableViewController, AVAudioPlayerDelegate {
         setToolbarManagement()
         
         if audioPlayer.getIsPlaying() {
+            audioPlayer.setDelegate(sender: self)
             navigationController!.isToolbarHidden = false
         } else {
             navigationController!.isToolbarHidden = true
@@ -187,12 +187,10 @@ class PlayListListController: UITableViewController, AVAudioPlayerDelegate {
             let prev = songParams.actualSongIndex
             if mode {
                 songParams.actualSongIndex = audioPlayer.nextSong(currentIndex: prev,
-                                                        hasShuffle: songParams.isShuffleModeActive,
-                                                        totalSongs: cfm.getCountFiles())
+                                                        hasShuffle: songParams.isShuffleModeActive)
             } else {
                 songParams.actualSongIndex = audioPlayer.prevSong(currentIndex: prev,
-                                                        hasShuffle: songParams.isShuffleModeActive,
-                                                        totalSongs: cfm.getCountFiles())
+                                                        hasShuffle: songParams.isShuffleModeActive)
             }
             af.resetUIList(tableView, files: cfm.getCountFiles())
         }
@@ -200,6 +198,7 @@ class PlayListListController: UITableViewController, AVAudioPlayerDelegate {
         let next = cfm.getFile(at: songParams.actualSongIndex)
         let newSong = cfm.getURLFromDoc(of: next)
         
+        songParams.title = next
         audioPlayer.setSong(song: newSong)
         audioPlayer.setDelegate(sender: self)
         audioPlayer.setPlay()
@@ -219,11 +218,6 @@ class PlayListListController: UITableViewController, AVAudioPlayerDelegate {
     
     @objc private func nextSong() { goNextOrPreviousSong(mode: true, isOnPause: !audioPlayer.getIsPlaying()) }
     
-    @objc private func displaySong() {
-        fromToolbarToDisplay = true
-        performSegue(withIdentifier: "goToPlaySong", sender: nil)
-    }
-    
     // MARK: Funciones Auxiliares
     
     /**
@@ -239,12 +233,9 @@ class PlayListListController: UITableViewController, AVAudioPlayerDelegate {
         swipeRight.direction = .right
         let swipeLeft = UISwipeGestureRecognizer(target: self, action: #selector(nextSong))
         swipeLeft.direction = .left
-        //let tap = UITapGestureRecognizer(target: self, action: #selector(displaySong))
-        //tap.numberOfTapsRequired = 1
         
         navigationController!.toolbar.addGestureRecognizer(swipeLeft)
         navigationController!.toolbar.addGestureRecognizer(swipeRight)
-        //navigationController!.toolbar.addGestureRecognizer(tap)
     }
     
     /**
@@ -293,9 +284,9 @@ class PlayListListController: UITableViewController, AVAudioPlayerDelegate {
     private func createAlert(isModificationMode: Bool, _ index: Int?) {
         var alert: UIAlertController!
         if isModificationMode {
-            alert = UIAlertController(title: "Modificar Playlist", message: nil, preferredStyle: .alert)
+            alert = UIAlertController(title: NSLocalizedString("titlealert.modify", comment: ""), message: nil, preferredStyle: .alert)
         } else {
-            alert = UIAlertController(title: "Añadir Playlist", message: nil, preferredStyle: .alert)
+            alert = UIAlertController(title: NSLocalizedString("titlealert.add", comment: ""), message: nil, preferredStyle: .alert)
         }
         
         alert.addTextField(configurationHandler: {
@@ -304,7 +295,7 @@ class PlayListListController: UITableViewController, AVAudioPlayerDelegate {
                 textField.text = self.playlists[index!]
             }
             textField.isSecureTextEntry = false
-            textField.placeholder = "Nombre"
+            textField.placeholder = NSLocalizedString("placeholder.alert", comment: "")
         })
         
         let add = UIAlertAction(title: "Ok", style: .default, handler: {
@@ -323,7 +314,7 @@ class PlayListListController: UITableViewController, AVAudioPlayerDelegate {
             }
         })
         
-        let dismiss = UIAlertAction(title: "Atrás", style: .default, handler: {
+        let dismiss = UIAlertAction(title: NSLocalizedString("backbutton.alert", comment: ""), style: .default, handler: {
             action in
             self.dismiss(animated: true, completion: nil)
         })
