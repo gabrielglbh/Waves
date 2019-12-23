@@ -27,8 +27,7 @@ class SelectSongsController: UITableViewController {
         cfm.checkUserDefaults(key: "music")
         
         navigationController!.navigationBar.titleTextAttributes =
-            [NSAttributedString.Key.foregroundColor: UIColor.systemYellow]
-        navigationController!.navigationBar.barTintColor = UIColor.darkGray
+            [NSAttributedString.Key.foregroundColor: UIColor(named: "TintColor") as Any]
     }
 
     // MARK: Funciones de UITableView
@@ -58,13 +57,13 @@ class SelectSongsController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let selectedCell = tableView.cellForRow(at: indexPath)
-        selectedCell?.contentView.backgroundColor = UIColor.darkGray
+        selectedCell?.contentView.backgroundColor = UIColor(named: "SelectionColor")
         selectedSongs.append(indexPath.row)
     }
     
     override func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
         let selectedCell = tableView.cellForRow(at: indexPath)
-        selectedCell?.contentView.backgroundColor = UIColor.init(red: 111, green: 113, blue: 121, alpha: 0)
+        selectedCell?.contentView.backgroundColor = UIColor(named: "CellColor")
         for (ind, row) in selectedSongs.enumerated() {
             if row == indexPath.row {
                 selectedSongs.remove(at: ind)

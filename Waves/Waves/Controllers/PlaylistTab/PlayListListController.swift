@@ -33,9 +33,9 @@ class PlayListListController: UITableViewController, AVAudioPlayerDelegate {
         super.viewDidLoad()
         
         let add = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addPlaylist))
-        self.editButtonItem.tintColor = UIColor.systemYellow
+        self.editButtonItem.tintColor = UIColor(named: "TintColor")
         self.editButtonItem.title = NSLocalizedString("editButtontitle", comment: "")
-        add.tintColor = UIColor.systemYellow
+        add.tintColor = UIColor(named: "TintColor")
         self.navigationItem.rightBarButtonItems = [self.editButtonItem, add]
         
         title = NSLocalizedString("title.playlistlistcontroller", comment: "")
@@ -56,8 +56,7 @@ class PlayListListController: UITableViewController, AVAudioPlayerDelegate {
         cfm.setCFM(key: songParams.key, isPlaylist: false)
         
         navigationController!.navigationBar.titleTextAttributes =
-            [NSAttributedString.Key.foregroundColor: UIColor.systemYellow]
-        navigationController!.navigationBar.barTintColor = UIColor.darkGray
+            [NSAttributedString.Key.foregroundColor: UIColor(named: "TintColor") as Any]
         
         setToolbarManagement()
         
@@ -91,7 +90,6 @@ class PlayListListController: UITableViewController, AVAudioPlayerDelegate {
 
         cell.textLabel?.text = playlists[indexPath.row]
         cell.textLabel?.font = UIFont.boldSystemFont(ofSize: 18)
-        cell.textLabel?.textColor = UIColor.white
         
         let longPress = UILongPressGestureRecognizer(target: self, action: #selector(modifyPlaylist))
         longPress.minimumPressDuration = 1
@@ -202,6 +200,7 @@ class PlayListListController: UITableViewController, AVAudioPlayerDelegate {
         audioPlayer.setSong(song: newSong)
         audioPlayer.setDelegate(sender: self)
         audioPlayer.setPlay()
+        audioPlayer.setSongWithParams(songParams: songParams)
         
         if !isOnPause {
             setToolbarButtonsForPlayingSong(playButton: "pause.circle")
@@ -226,9 +225,7 @@ class PlayListListController: UITableViewController, AVAudioPlayerDelegate {
     * Swipe a la derecha: PreviousSong
     * Tap -> Lleva a la canción que está sonando
     */
-    private func setToolbarManagement() {
-        navigationController!.toolbar.barTintColor = UIColor.darkGray
-        
+    private func setToolbarManagement() {        
         let swipeRight = UISwipeGestureRecognizer(target: self, action: #selector(previousSong))
         swipeRight.direction = .right
         let swipeLeft = UISwipeGestureRecognizer(target: self, action: #selector(nextSong))
@@ -246,7 +243,7 @@ class PlayListListController: UITableViewController, AVAudioPlayerDelegate {
             let button = UIButton(type: .custom)
             
             button.setBackgroundImage(UIImage(systemName: img), for: .normal)
-            button.tintColor = UIColor.white
+            button.tintColor = UIColor(named: "TextColor")
             
             button.addTarget(self, action: #selector(managePlayAction), for: .touchUpInside)
             return UIBarButtonItem.init(customView: button)
@@ -255,7 +252,7 @@ class PlayListListController: UITableViewController, AVAudioPlayerDelegate {
             
             if title != nil {
                 label.text = title
-                label.textColor = UIColor.white
+                label.textColor = UIColor(named: "TextColor")
                 label.font = UIFont.boldSystemFont(ofSize: 18)
             } else {
                 label.text = detail
@@ -305,6 +302,7 @@ class PlayListListController: UITableViewController, AVAudioPlayerDelegate {
                 if isModificationMode {
                     self.playlists.remove(at: index!)
                     self.playlists.insert(playlist, at: index!)
+                    // MARK: TODO Meter las canciones de dicha lista en la nueva key
                 } else {
                     self.playlists.insert(playlist, at: 0)
                 }
@@ -321,7 +319,6 @@ class PlayListListController: UITableViewController, AVAudioPlayerDelegate {
         
         alert.addAction(dismiss)
         alert.addAction(add)
-        alert.view.tintColor = UIColor.darkGray
         present(alert, animated: true)
     }
 }

@@ -16,8 +16,8 @@ class AuxiliarFunctions {
     func resetUIList(_ tableView: UITableView, files: Int) {
         for song in 0...files {
             let cell = tableView.cellForRow(at: IndexPath(row: song, section: 0))
-            cell?.textLabel?.textColor = UIColor.white
-            cell?.detailTextLabel?.textColor = UIColor.white
+            cell?.textLabel?.textColor = UIColor(named: "TextColor")
+            cell?.detailTextLabel?.textColor = UIColor(named: "Detail")
         }
     }
     

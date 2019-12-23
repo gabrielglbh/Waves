@@ -29,7 +29,7 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
         super.viewDidLoad()
         cfm.printDocsPath()
         self.navigationItem.rightBarButtonItem = self.editButtonItem
-        self.editButtonItem.tintColor = UIColor.systemYellow
+        self.editButtonItem.tintColor = UIColor(named: "TintColor")
         self.editButtonItem.title = NSLocalizedString("editButtontitle", comment: "")
         
         self.title = NSLocalizedString("title.songlistcontroller", comment: "")
@@ -46,8 +46,7 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
         songParams = audioPlayer.getSongParams()
 	
         navigationController!.navigationBar.titleTextAttributes =
-            [NSAttributedString.Key.foregroundColor: UIColor.systemYellow]
-        navigationController!.navigationBar.barTintColor = UIColor.darkGray
+            [NSAttributedString.Key.foregroundColor: UIColor(named: "TintColor") as Any]
         
         hidesBottomBarWhenPushed = false
         af.resetUIList(tableView, files: cfm.getCountFiles())
@@ -284,9 +283,7 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
     * Swipe a la derecha: PreviousSong
     * Tap -> Lleva a la canción que está sonando
     */
-    private func setToolbarManagement() {
-        navigationController!.toolbar.barTintColor = UIColor.darkGray
-        
+    private func setToolbarManagement() {        
         let swipeRight = UISwipeGestureRecognizer(target: self, action: #selector(previousSong))
         swipeRight.direction = .right
         let swipeLeft = UISwipeGestureRecognizer(target: self, action: #selector(nextSong))
@@ -304,7 +301,7 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
             let button = UIButton(type: .custom)
             
             button.setBackgroundImage(UIImage(systemName: img), for: .normal)
-            button.tintColor = UIColor.white
+            button.tintColor = UIColor(named: "TextColor")
             
             button.addTarget(self, action: #selector(managePlayAction), for: .touchUpInside)
             return UIBarButtonItem.init(customView: button)
@@ -313,7 +310,7 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
             
             if title != nil {
                 label.text = title
-                label.textColor = UIColor.white
+                label.textColor = UIColor(named: "TextColor")
                 label.font = UIFont.boldSystemFont(ofSize: 18)
             } else {
                 label.text = detail

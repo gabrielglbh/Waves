@@ -58,8 +58,7 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
 		getAndSetDataFromID3(songToBePlayed!)
         setPlayerToNewSong(songToBePlayed!, isOnPause: false, isBeingPlayedOnList: currentSongFromList!)
         
-        navigationController!.navigationBar.tintColor = UIColor.systemYellow
-        navigationController!.navigationBar.barTintColor = UIColor.darkGray
+        navigationController!.navigationBar.tintColor = UIColor(named: "TintColor")
         navigationController!.isToolbarHidden = true
         
         setRepeatMode()
@@ -251,6 +250,12 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
                 startTimerOfSong()
             } else {
                 initialTime?.text = "0:00"
+                if hasEnded {
+                    audioPlayer.setCurrentTime(at: 0)
+                    audioPlayer.prepareToPlay()
+                    audioPlayer.play()
+                    startTimerOfSong()
+                }
             }
         } else {
             let limitFromSkippingSong = secondsToTimeInterval(5)

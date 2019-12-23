@@ -94,3 +94,6 @@
 
 /* Class = "UILabel"; text = "Label"; ObjectID = "zdL-1K-Cgx"; */
 "zdL-1K-Cgx.text" = "Label";
+
+/* Class = "UIBarButtonItem"; title = "Lyrics"; ObjectID = "CRt-qK-hof"; */
+"CRt-qK-hof.title" = "Letras";

@@ -30,9 +30,9 @@ class DisplayContentPlaylistController: UITableViewController, AVAudioPlayerDele
         super.viewDidLoad()
 
         let add = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addSongs))
-        self.editButtonItem.tintColor = UIColor.systemYellow
+        self.editButtonItem.tintColor = UIColor(named: "TintColor")
         self.editButtonItem.title = NSLocalizedString("editButtontitle", comment: "")
-        add.tintColor = UIColor.systemYellow
+        add.tintColor = UIColor(named: "TintColor")
         self.navigationItem.rightBarButtonItems = [self.editButtonItem, add]
     }
     
@@ -43,8 +43,7 @@ class DisplayContentPlaylistController: UITableViewController, AVAudioPlayerDele
         audioPlayer = ap.getInstance()
         songParams = audioPlayer.getSongParams()
         
-        navigationController!.navigationBar.tintColor = UIColor.systemYellow
-        navigationController!.navigationBar.barTintColor = UIColor.darkGray
+        navigationController!.navigationBar.tintColor = UIColor(named: "TintColor")
         
         key = title!
         cfm.setCFM(key: key, isPlaylist: true)
@@ -259,6 +258,7 @@ class DisplayContentPlaylistController: UITableViewController, AVAudioPlayerDele
         audioPlayer.setSong(song: newSong)
         audioPlayer.setDelegate(sender: self)
         audioPlayer.setPlay()
+        audioPlayer.setSongWithParams(songParams: songParams)
         
         if !isOnPause {
             setToolbarButtonsForPlayingSong(playButton: "pause.circle")
@@ -285,8 +285,6 @@ class DisplayContentPlaylistController: UITableViewController, AVAudioPlayerDele
     * Tap -> Lleva a la canción que está sonando
     */
     private func setToolbarManagement() {
-        navigationController!.toolbar.barTintColor = UIColor.darkGray
-        
         let swipeRight = UISwipeGestureRecognizer(target: self, action: #selector(previousSong))
         swipeRight.direction = .right
         let swipeLeft = UISwipeGestureRecognizer(target: self, action: #selector(nextSong))
@@ -304,7 +302,7 @@ class DisplayContentPlaylistController: UITableViewController, AVAudioPlayerDele
             let button = UIButton(type: .custom)
             
             button.setBackgroundImage(UIImage(systemName: img), for: .normal)
-            button.tintColor = UIColor.white
+            button.tintColor = UIColor(named: "TextColor")
             
             button.addTarget(self, action: #selector(managePlayAction), for: .touchUpInside)
             return UIBarButtonItem.init(customView: button)
@@ -313,7 +311,7 @@ class DisplayContentPlaylistController: UITableViewController, AVAudioPlayerDele
             
             if title != nil {
                 label.text = title
-                label.textColor = UIColor.white
+                label.textColor = UIColor(named: "TextColor")
                 label.font = UIFont.boldSystemFont(ofSize: 18)
             } else {
                 label.text = detail
