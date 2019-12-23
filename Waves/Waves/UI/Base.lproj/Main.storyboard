@@ -829,10 +829,10 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
             <color red="0.33866460480860955" green="0.34461068040345083" blue="0.37231752623350256" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
         </namedColor>
         <namedColor name="TintColor">
-            <color red="0.099426515399999998" green="0.46337997910000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+            <color red="1" green="0.62732235781133994" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="uMS-u9-aki"/>
+        <segue reference="gM3-6o-XZ0"/>
     </inferredMetricsTieBreakers>
 </document>

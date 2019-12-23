@@ -300,14 +300,17 @@ class PlayListListController: UITableViewController, AVAudioPlayerDelegate {
             let playlist = alert.textFields![0].text!
             if playlist != "" {
                 if isModificationMode {
+                    if let songs = UserDefaults.standard.object(forKey: self.playlists[index!]) {
+                        self.cfm.setUserDefaults(files: songs as! [String], key: playlist)
+                    }
+                    UserDefaults.standard.removeObject(forKey: self.playlists[index!])
                     self.playlists.remove(at: index!)
                     self.playlists.insert(playlist, at: index!)
-                    // MARK: TODO Meter las canciones de dicha lista en la nueva key
                 } else {
                     self.playlists.insert(playlist, at: 0)
                 }
                 
-                UserDefaults.standard.set(self.playlists, forKey: "playlists")
+                self.cfm.setUserDefaults(files: self.playlists, key: "playlists")
                 self.tableView.reloadData()
             }
         })

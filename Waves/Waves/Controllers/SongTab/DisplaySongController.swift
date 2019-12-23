@@ -193,7 +193,7 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
             repeatSong?.tintColor = .lightGray
         } else {
             repeatSong?.setImage(UIImage(systemName: "repeat.1"), for: .normal)
-            repeatSong?.tintColor = .systemYellow
+            repeatSong?.tintColor = UIColor(named: "TintColor")
         }
         songParams.isRepeatModeActive = !songParams.isRepeatModeActive
     }
@@ -203,7 +203,7 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
         if songParams.isShuffleModeActive {
             shuffleSongs?.tintColor = .lightGray
         } else {
-            shuffleSongs?.tintColor = .systemYellow
+            shuffleSongs?.tintColor = UIColor(named: "TintColor")
         }
         songParams.isShuffleModeActive = !songParams.isShuffleModeActive
     }
