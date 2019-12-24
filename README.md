@@ -7,6 +7,7 @@ Este reproductor tiene las siguientes funcionalidades:
   - Control de música mediante una toolbar in-app (deslizando hacia la derecha o izquierda)
   - Control de música mediante periféricos (altavoces/auriculares).
   - Adaptación a Dark/Light Mode.
+  - Adaptación a distintas pantallas (iPhone 7 a iPhone 11 Pro Max)
   - Adaptación de distintos idiomas: Inglés y Español.
   - Creación de playlists personalizadas en base a la música que se tenga en la biblioteca.
   - Eliminar/Mover canciones en playlists y biblioteca.
