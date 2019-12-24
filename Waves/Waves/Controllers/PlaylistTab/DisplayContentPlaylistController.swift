@@ -9,6 +9,13 @@
 import UIKit
 import AVFoundation
 
+extension DisplayContentPlaylistController: UISearchResultsUpdating {
+    func updateSearchResults(for searchController: UISearchController) {
+        let searchBar = searchController.searchBar
+        filterContentForSearchText(searchBar.text!)
+    }
+}
+
 class DisplayContentPlaylistController: UITableViewController, AVAudioPlayerDelegate {
 
     // Instancia para la administración de ficheros
@@ -22,9 +29,19 @@ class DisplayContentPlaylistController: UITableViewController, AVAudioPlayerDele
     var key: String!
     
     let af = AuxiliarFunctions()
+    let searchController = UISearchController(searchResultsController: nil)
     
     var playButton: UIBarButtonItem!
     var songToolbarText: UIBarButtonItem!
+    
+    // Variables para la search bar
+    var filteredSongs: [String] = []
+    var isSearchBarEmpty: Bool {
+        return searchController.searchBar.text?.isEmpty ?? true
+    }
+    var isFiltering: Bool {
+        return searchController.isActive && !isSearchBarEmpty
+    }
         
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -57,10 +74,33 @@ class DisplayContentPlaylistController: UITableViewController, AVAudioPlayerDele
         }
         
         setToolbarManagement()
+        setSearchBar()
     }
     
     override func viewDidAppear(_ animated: Bool) {
         if audioPlayer.getIsPlaying() == true { setToolbarButtonsForPlayingSong(playButton: "pause.circle") }
+    }
+    
+    // MARK: Funciones Search Bar
+    
+    private func setSearchBar() {
+        searchController.searchResultsUpdater = self
+        searchController.obscuresBackgroundDuringPresentation = false
+        searchController.searchBar.placeholder = NSLocalizedString("findsong.songlist", comment: "")
+        navigationItem.searchController = searchController
+        definesPresentationContext = true
+    }
+    
+    /**
+     * filterContentForSearchText: Filtrado de coincidencia de busqueda
+     */
+    func filterContentForSearchText(_ searchText: String) {
+        filteredSongs = newPlaylist.filter {
+            (title: String) -> Bool in
+            return title.lowercased().contains(searchText.lowercased())
+        }
+      
+      tableView.reloadData()
     }
 
     // MARK: Funciones del UITableView
@@ -70,14 +110,23 @@ class DisplayContentPlaylistController: UITableViewController, AVAudioPlayerDele
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if isFiltering {
+            return filteredSongs.count
+        }
+          
         return newPlaylist.count
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "songPlaylist", for: indexPath)
 
-        let song = cfm.getFile(at: indexPath.row)
-        af.getAndSetDataFromID3(song: cfm.getURLFromDoc(of: song), cell: cell)
+        var song_name: String!
+        if isFiltering {
+            song_name = filteredSongs[indexPath.row]
+        } else {
+            song_name = cfm.getFile(at: indexPath.row)
+        }
+        af.getAndSetDataFromID3(song: cfm.getURLFromDoc(of: song_name), cell: cell)
        
         cell.textLabel?.font = UIFont.boldSystemFont(ofSize: 18)
         
@@ -189,19 +238,24 @@ class DisplayContentPlaylistController: UITableViewController, AVAudioPlayerDele
         if segue.identifier == "goDisplayFromPlaylist" {
             if (segue.destination.view != nil) {
                 hidesBottomBarWhenPushed = true
-                var selectedRow: Int?
-                selectedRow = tableView.indexPathForSelectedRow!.row
-                
+                let selectedRow = tableView.indexPathForSelectedRow!.row
+                let song: String!
                 let view = segue.destination as! DisplaySongController
                 
-                if audioPlayer.getIsPlaying() && songParams.actualSongIndex == selectedRow {
-                    view.currentSongFromList = true
-                } else {
-                    if audioPlayer.getIsPlaying() { audioPlayer.stop() }
+                if isFiltering {
+                    song = filteredSongs[selectedRow]
+                    // MARK: TODO - Verificar canción sonando
                     view.currentSongFromList = false
+                } else {
+                    song = cfm.getFile(at: selectedRow)
+                    if audioPlayer.getIsPlaying() && songParams.actualSongIndex == selectedRow {
+                        view.currentSongFromList = true
+                    } else {
+                        if audioPlayer.getIsPlaying() { audioPlayer.stop() }
+                        view.currentSongFromList = false
+                    }
                 }
                 
-                let song = cfm.getFile(at: selectedRow!)
                 view.songRawName = song
                 view.fromPlaylist = true
                 
@@ -213,7 +267,7 @@ class DisplayContentPlaylistController: UITableViewController, AVAudioPlayerDele
                 songParams.maxIndexSongs = newPlaylist.count
                 songParams.isShuffleModeActive = !songParams.isShuffleModeActive
                 songParams.isRepeatModeActive = !songParams.isRepeatModeActive
-                songParams.actualSongIndex = selectedRow!
+                songParams.actualSongIndex = selectedRow
             }
         }
         audioPlayer.setSongWithParams(songParams: songParams)

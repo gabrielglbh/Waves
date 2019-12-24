@@ -9,6 +9,14 @@
 import UIKit
 import AVFoundation
 
+extension PlayListListController: UISearchResultsUpdating {
+    func updateSearchResults(for searchController: UISearchController) {
+        let searchBar = searchController.searchBar
+        filterContentForSearchText(searchBar.text!)
+    }
+}
+
+
 class PlayListListController: UITableViewController, AVAudioPlayerDelegate {
     
     var playlists = [String]()
@@ -22,9 +30,19 @@ class PlayListListController: UITableViewController, AVAudioPlayerDelegate {
     let cfm = CustomFileManager()
     
     let af = AuxiliarFunctions()
+    let searchController = UISearchController(searchResultsController: nil)
     
     var playButton: UIBarButtonItem!
     var songToolbarText: UIBarButtonItem!
+    
+    // Variables para la search bar
+    var filteredPlaylist: [String] = []
+    var isSearchBarEmpty: Bool {
+        return searchController.searchBar.text?.isEmpty ?? true
+    }
+    var isFiltering: Bool {
+        return searchController.isActive && !isSearchBarEmpty
+    }
 
     /**
     * viewDidLoad: Se añaden los botones de Edit y + en la esquina superior derecha y se inicializan el UserDefaults de la playlists.
@@ -66,6 +84,30 @@ class PlayListListController: UITableViewController, AVAudioPlayerDelegate {
         } else {
             navigationController!.isToolbarHidden = true
         }
+        
+        setSearchBar()
+    }
+    
+    // MARK: Funciones Search Bar
+    
+    private func setSearchBar() {
+        searchController.searchResultsUpdater = self
+        searchController.obscuresBackgroundDuringPresentation = false
+        searchController.searchBar.placeholder = NSLocalizedString("findplaylist.playlistlist", comment: "")
+        navigationItem.searchController = searchController
+        definesPresentationContext = true
+    }
+    
+    /**
+     * filterContentForSearchText: Filtrado de coincidencia de busqueda
+     */
+    func filterContentForSearchText(_ searchText: String) {
+        filteredPlaylist = playlists.filter {
+            (title: String) -> Bool in
+            return title.lowercased().contains(searchText.lowercased())
+        }
+      
+      tableView.reloadData()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -79,6 +121,10 @@ class PlayListListController: UITableViewController, AVAudioPlayerDelegate {
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if isFiltering {
+            return filteredPlaylist.count
+        }
+          
         return playlists.count
     }
 
@@ -87,8 +133,13 @@ class PlayListListController: UITableViewController, AVAudioPlayerDelegate {
      */
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "CellPlaylist", for: indexPath)
+        
+        if isFiltering {
+            cell.textLabel?.text = filteredPlaylist[indexPath.row]
+        } else {
+            cell.textLabel?.text = playlists[indexPath.row]
+        }
 
-        cell.textLabel?.text = playlists[indexPath.row]
         cell.textLabel?.font = UIFont.boldSystemFont(ofSize: 18)
         
         let longPress = UILongPressGestureRecognizer(target: self, action: #selector(modifyPlaylist))
@@ -150,7 +201,11 @@ class PlayListListController: UITableViewController, AVAudioPlayerDelegate {
         if segue.identifier == "getPlaylist" {
             if (segue.destination.view != nil) {
                 let view = segue.destination as! DisplayContentPlaylistController
-                view.title = playlists[tableView.indexPathForSelectedRow!.row]
+                if isFiltering {
+                    view.title = filteredPlaylist[tableView.indexPathForSelectedRow!.row]
+                } else {
+                    view.title = playlists[tableView.indexPathForSelectedRow!.row]
+                }
             }
         }
     }

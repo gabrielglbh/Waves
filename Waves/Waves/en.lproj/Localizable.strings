@@ -23,3 +23,7 @@
 "placeholder.alert" = "Name";
 
 "backbutton.alert" = "Back";
+
+"findsong.songlist" = "Find a Song";
+
+"findplaylist.playlistlist" = "Find a Playlist";
