@@ -27,6 +27,7 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
     var songTime = Timer()
     
     var fromPlaylist = false
+    var isCarModeActive = false
     
     @IBOutlet var portrait: UIImageView?
     @IBOutlet var songName: UILabel?
@@ -37,8 +38,9 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
     @IBOutlet var playPauseButton: UIButton?
     @IBOutlet var repeatSong: UIButton?
     @IBOutlet var shuffleSongs: UIButton?
+    @IBOutlet var carMode: UIBarButtonItem?
     
-    @IBOutlet var songDurationSlider: UISlider?
+    @IBOutlet var songSlider: UISlider?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -112,7 +114,7 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
             
             initialTime?.text = "0:00"
             
-            songDurationSlider?.value = 0
+            songSlider?.value = 0
         
             if !isOnPause {
                 audioPlayer.prepareToPlay()
@@ -124,10 +126,10 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
         let duration = audioPlayer.getDuration()
         lastTime?.text = convertDurationToString(duration: duration)
         
-        songDurationSlider?.minimumValue = 0
-        songDurationSlider?.maximumValue = Float(duration)
+        songSlider?.minimumValue = 0
+        songSlider?.maximumValue = Float(duration)
         
-        if isBeingPlayedOnList { songDurationSlider?.value = Float(audioPlayer.getCurrentTime()) }
+        if isBeingPlayedOnList { songSlider?.value = Float(audioPlayer.getCurrentTime()) }
 
         songParams.title = songName!.text! + ".mp3"
         audioPlayer.setDelegate(sender: self)
@@ -182,8 +184,8 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
      * playFromSelectedTime: Al desplazar el slider, la canción se reproduce desde donde el usuario deja el slider
      */
     @IBAction private func playFromSelectedTime() {
-        audioPlayer.setCurrentTime(at: Double(songDurationSlider!.value))
-        initialTime?.text = convertDurationToString(duration: Double(songDurationSlider!.value))
+        audioPlayer.setCurrentTime(at: Double(songSlider!.value))
+        initialTime?.text = convertDurationToString(duration: Double(songSlider!.value))
     }
     
     // Nombre explanatorio
@@ -209,6 +211,49 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
     }
     
     // Nombre explanatorio
+    @IBAction private func setCarMode() {
+        if isCarModeActive {
+            carMode?.image = UIImage(systemName: "car.fill")
+            songSlider?.isHidden = false
+            initialTime?.isHidden = false
+            lastTime?.isHidden = false
+            
+            songName?.font = UIFont.systemFont(ofSize: 23)
+            songArtist?.font = UIFont.systemFont(ofSize: 17)
+            for constraint in self.view.constraints {
+                if constraint.identifier == "bottomSongArtist" {
+                    constraint.constant = 8
+                } else if constraint.identifier == "alignmentHorizontalPlayButton" {
+                    constraint.constant = 0
+                } else if constraint.identifier == "alignmentHorizontalPlayButtonAlter" {
+                    constraint.constant = 0
+                }
+            }
+        } else {
+            carMode?.image = UIImage(systemName: "car")
+            songSlider?.isHidden = true
+            initialTime?.isHidden = true
+            lastTime?.isHidden = true
+            
+            let conf = UIImage.SymbolConfiguration(scale: .large)
+            playPauseButton?.imageView?.preferredSymbolConfiguration = conf
+            
+            songName?.font = UIFont.systemFont(ofSize: 35)
+            songArtist?.font = UIFont.systemFont(ofSize: 29)
+            for constraint in self.view.constraints {
+                if constraint.identifier == "bottomSongArtist" {
+                    constraint.constant = 0
+                } else if constraint.identifier == "alignmentHorizontalPlayButton" {
+                    constraint.constant = -40
+                } else if constraint.identifier == "alignmentHorizontalPlayButtonAlter" {
+                    constraint.constant = 40
+                }
+            }
+        }
+        isCarModeActive = !isCarModeActive
+    }
+    
+    // Nombre explanatorio
     private func startTimerOfSong() {
          songTime = Timer.scheduledTimer(timeInterval: 1, target: self,
                                          selector: (#selector(DisplaySongController.updateSongTimer)),
@@ -220,7 +265,7 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
      * que pasa de la canción
      */
     @objc private func updateSongTimer() {
-        songDurationSlider?.value += 1
+        songSlider?.value += 1
         initialTime?.text = convertDurationToString(duration: audioPlayer.getCurrentTime())
     }
     
@@ -242,7 +287,7 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
      */
     private func goNextOrPreviousSong(_ mode: Bool, hasEnded: Bool) {
         songTime.invalidate()
-        songDurationSlider?.value = 0
+        songSlider?.value = 0
         
         if songParams.isRepeatModeActive {
             if audioPlayer.evaluateOnRepeat() {
