@@ -29,6 +29,10 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
     var fromPlaylist = false
     var isCarModeActive = false
     
+    let conf = UIImage.SymbolConfiguration(pointSize: 60, weight: .unspecified, scale: .unspecified)
+    let confAux = UIImage.SymbolConfiguration(pointSize: 25, weight: .unspecified, scale: .unspecified)
+    let confAugmented = UIImage.SymbolConfiguration(pointSize: 150, weight: .unspecified, scale: .unspecified)
+    
     @IBOutlet var portrait: UIImageView?
     @IBOutlet var songName: UILabel?
     @IBOutlet var songArtist: UILabel?
@@ -36,6 +40,8 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
     @IBOutlet var lastTime: UILabel?
     
     @IBOutlet var playPauseButton: UIButton?
+    @IBOutlet var nextSongButton: UIButton?
+    @IBOutlet var prevSongButton: UIButton?
     @IBOutlet var repeatSong: UIButton?
     @IBOutlet var shuffleSongs: UIButton?
     @IBOutlet var carMode: UIBarButtonItem?
@@ -170,11 +176,19 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
      */
     @IBAction private func playSong() {
         if audioPlayer.getIsPlaying() {
-            playPauseButton?.setImage(UIImage(systemName: "play.circle.fill"), for: .normal)
+            if isCarModeActive {
+                playPauseButton?.setImage(UIImage(systemName: "play.circle.fill", withConfiguration: confAugmented), for: .normal)
+            } else {
+                playPauseButton?.setImage(UIImage(systemName: "play.circle.fill", withConfiguration: conf), for: .normal)
+            }
             audioPlayer.pause()
             songTime.invalidate()
         } else {
-            playPauseButton?.setImage(UIImage(systemName: "pause.circle.fill"), for: .normal)
+            if isCarModeActive {
+                playPauseButton?.setImage(UIImage(systemName: "pause.circle.fill", withConfiguration: confAugmented), for: .normal)
+            } else {
+                playPauseButton?.setImage(UIImage(systemName: "pause.circle.fill", withConfiguration: conf), for: .normal)
+            }
             audioPlayer.play()
             startTimerOfSong()
         }
@@ -210,7 +224,9 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
         songParams.isShuffleModeActive = !songParams.isShuffleModeActive
     }
     
-    // Nombre explanatorio
+    /**
+     * setCarMode: Agranda la interfaz para evitar distracciones al volante
+     */
     @IBAction private func setCarMode() {
         if isCarModeActive {
             carMode?.image = UIImage(systemName: "car.fill")
@@ -218,15 +234,23 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
             initialTime?.isHidden = false
             lastTime?.isHidden = false
             
+            var image: UIImage?
+            if audioPlayer.getIsPlaying() {
+                image = UIImage(systemName: "pause.circle.fill", withConfiguration: conf)
+            } else {
+                image = UIImage(systemName: "play.circle.fill", withConfiguration: conf)
+            }
+            playPauseButton?.setImage(image, for: .normal)
+            nextSongButton?.setImage(UIImage(systemName: "forward.end.fill", withConfiguration: confAux), for: .normal)
+            prevSongButton?.setImage(UIImage(systemName: "backward.end.fill", withConfiguration: confAux), for: .normal)
+            
             songName?.font = UIFont.systemFont(ofSize: 23)
             songArtist?.font = UIFont.systemFont(ofSize: 17)
             for constraint in self.view.constraints {
                 if constraint.identifier == "bottomSongArtist" {
                     constraint.constant = 8
-                } else if constraint.identifier == "alignmentHorizontalPlayButton" {
-                    constraint.constant = 0
-                } else if constraint.identifier == "alignmentHorizontalPlayButtonAlter" {
-                    constraint.constant = 0
+                } else if constraint.identifier == "safeAreaPlayButton" {
+                    constraint.constant = 5
                 }
             }
         } else {
@@ -235,18 +259,23 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
             initialTime?.isHidden = true
             lastTime?.isHidden = true
             
-            let conf = UIImage.SymbolConfiguration(scale: .large)
-            playPauseButton?.imageView?.preferredSymbolConfiguration = conf
+            var image: UIImage?
+            if audioPlayer.getIsPlaying() {
+                image = UIImage(systemName: "pause.circle.fill", withConfiguration: confAugmented)
+            } else {
+                image = UIImage(systemName: "play.circle.fill", withConfiguration: confAugmented)
+            }
+            playPauseButton?.setImage(image, for: .normal)
+            nextSongButton?.setImage(UIImage(systemName: "forward.end.fill", withConfiguration: confAugmented), for: .normal)
+            prevSongButton?.setImage(UIImage(systemName: "backward.end.fill", withConfiguration: confAugmented), for: .normal)
             
             songName?.font = UIFont.systemFont(ofSize: 35)
             songArtist?.font = UIFont.systemFont(ofSize: 29)
             for constraint in self.view.constraints {
                 if constraint.identifier == "bottomSongArtist" {
                     constraint.constant = 0
-                } else if constraint.identifier == "alignmentHorizontalPlayButton" {
-                    constraint.constant = -40
-                } else if constraint.identifier == "alignmentHorizontalPlayButtonAlter" {
-                    constraint.constant = 40
+                } else if constraint.identifier == "safeAreaPlayButton" {
+                    constraint.constant = 15
                 }
             }
         }
@@ -333,7 +362,11 @@ class DisplaySongController: UIViewController, AVAudioPlayerDelegate {
                     setPlayerToNewSong(newSong, isOnPause: !audioPlayer.getIsPlaying(), isBeingPlayedOnList: false)
                 }
     
-                songName?.font = UIFont.boldSystemFont(ofSize: 23)
+                if isCarModeActive {
+                    songName?.font = UIFont.systemFont(ofSize: 35)
+                } else {
+                    songName?.font = UIFont.systemFont(ofSize: 23)
+                }
             }
         }
     }

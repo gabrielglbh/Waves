@@ -9,7 +9,7 @@
 "6ZZ-x9-PjB.title" = "Atrás";
 
 /* Class = "UIButton"; normalTitle = "Lyrics"; ObjectID = "71P-bE-uCS"; */
-"71P-bE-uCS.normalTitle" = "Letras";
+"71P-bE-uCS.normalTitle" = "Letra";
 
 /* Class = "UILabel"; text = "17:21"; ObjectID = "7Mh-a1-yDK"; */
 "7Mh-a1-yDK.text" = "17:21";
@@ -66,13 +66,13 @@
 "bXC-Zz-ZId.title" = "Atrás";
 
 /* Class = "UIBarButtonItem"; title = "Lyrics"; ObjectID = "bxK-s7-hfI"; */
-"bxK-s7-hfI.title" = "Letras";
+"bxK-s7-hfI.title" = "Letra";
 
 /* Class = "UILabel"; text = "Subtitle"; ObjectID = "e2c-vD-xfn"; */
 "e2c-vD-xfn.text" = "Subtitle";
 
 /* Class = "UIButton"; normalTitle = "Lyrics"; ObjectID = "gri-zN-UoD"; */
-"gri-zN-UoD.normalTitle" = "Letras";
+"gri-zN-UoD.normalTitle" = "Letra";
 
 /* Class = "UILabel"; text = "5:32"; ObjectID = "ih1-9g-jDc"; */
 "ih1-9g-jDc.text" = "5:32";
@@ -90,10 +90,10 @@
 "rOK-u2-Qhh.title" = "Root View Controller";
 
 /* Class = "UIBarButtonItem"; title = "Lyrics"; ObjectID = "t6k-5b-iYn"; */
-"t6k-5b-iYn.title" = "Letras";
+"t6k-5b-iYn.title" = "Letra";
 
 /* Class = "UILabel"; text = "Label"; ObjectID = "zdL-1K-Cgx"; */
 "zdL-1K-Cgx.text" = "Label";
 
 /* Class = "UIBarButtonItem"; title = "Lyrics"; ObjectID = "CRt-qK-hof"; */
-"CRt-qK-hof.title" = "Letras";
+"CRt-qK-hof.title" = "Letra";

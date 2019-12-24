@@ -11,3 +11,4 @@ Este reproductor tiene las siguientes funcionalidades:
   - Creación de playlists personalizadas en base a la música que se tenga en la biblioteca.
   - Eliminar/Mover canciones en playlists y biblioteca.
   - Disposición de Lyrics en las canciones que dispongan de ellas (source: metadata ID3).
+  - Modo Coche con interfaz ampliada para evitar distracciones.
