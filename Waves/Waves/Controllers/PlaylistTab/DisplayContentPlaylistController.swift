@@ -9,14 +9,7 @@
 import UIKit
 import AVFoundation
 
-extension DisplayContentPlaylistController: UISearchResultsUpdating {
-    func updateSearchResults(for searchController: UISearchController) {
-        let searchBar = searchController.searchBar
-        filterContentForSearchText(searchBar.text!)
-    }
-}
-
-class DisplayContentPlaylistController: UITableViewController, AVAudioPlayerDelegate {
+class DisplayContentPlaylistController: UITableViewController, AVAudioPlayerDelegate, UISearchResultsUpdating {
 
     // Instancia para la administración de ficheros
     var cfm = CustomFileManager()
@@ -82,6 +75,11 @@ class DisplayContentPlaylistController: UITableViewController, AVAudioPlayerDele
     }
     
     // MARK: Funciones Search Bar
+    
+    func updateSearchResults(for searchController: UISearchController) {
+        let searchBar = searchController.searchBar
+        filterContentForSearchText(searchBar.text!)
+    }
     
     private func setSearchBar() {
         searchController.searchResultsUpdater = self
@@ -244,11 +242,15 @@ class DisplayContentPlaylistController: UITableViewController, AVAudioPlayerDele
                 
                 if isFiltering {
                     song = filteredSongs[selectedRow]
-                    // MARK: TODO - Verificar canción sonando
-                    view.currentSongFromList = false
+                    if audioPlayer.getIsPlaying() && songParams.title == song {
+                        view.currentSongFromList = true
+                    } else {
+                        if audioPlayer.getIsPlaying() { audioPlayer.stop() }
+                        view.currentSongFromList = false
+                    }
                 } else {
                     song = cfm.getFile(at: selectedRow)
-                    if audioPlayer.getIsPlaying() && songParams.actualSongIndex == selectedRow {
+                    if audioPlayer.getIsPlaying() && (songParams.actualSongIndex == selectedRow || songParams.title == song) {
                         view.currentSongFromList = true
                     } else {
                         if audioPlayer.getIsPlaying() { audioPlayer.stop() }
@@ -267,10 +269,11 @@ class DisplayContentPlaylistController: UITableViewController, AVAudioPlayerDele
                 songParams.maxIndexSongs = newPlaylist.count
                 songParams.isShuffleModeActive = !songParams.isShuffleModeActive
                 songParams.isRepeatModeActive = !songParams.isRepeatModeActive
-                songParams.actualSongIndex = selectedRow
+                songParams.actualSongIndex = newPlaylist.firstIndex(of: song)!
             }
         }
         audioPlayer.setSongWithParams(songParams: songParams)
+        searchController.searchBar.text = ""
     }
     
     @objc private func addSongs() {

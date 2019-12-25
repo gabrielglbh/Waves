@@ -9,14 +9,7 @@
 import UIKit
 import AVFoundation
 
-extension SongListController: UISearchResultsUpdating {
-    func updateSearchResults(for searchController: UISearchController) {
-        let searchBar = searchController.searchBar
-        filterContentForSearchText(searchBar.text!)
-    }
-}
-
-class SongListController: UITableViewController, AVAudioPlayerDelegate {
+class SongListController: UITableViewController, AVAudioPlayerDelegate, UISearchResultsUpdating {
 	
     // Instancia única para toda la aplicación de la canción que suena
 	let ap = AudioPlayer()
@@ -86,6 +79,11 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
     }
     
     // MARK: Funciones Search Bar
+    
+    func updateSearchResults(for searchController: UISearchController) {
+        let searchBar = searchController.searchBar
+        filterContentForSearchText(searchBar.text!)
+    }
     
     private func setSearchBar() {
         searchController.searchResultsUpdater = self
@@ -248,11 +246,15 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
                 
                 if isFiltering {
                     song = filteredSongs[selectedRow]
-                    // MARK: TODO - Verificar canción sonando
-                    view.currentSongFromList = false
+                    if audioPlayer.getIsPlaying() && songParams.title == song {
+                        view.currentSongFromList = true
+                    } else {
+                        if audioPlayer.getIsPlaying() { audioPlayer.stop() }
+                        view.currentSongFromList = false
+                    }
                 } else {
                     song = cfm.getFile(at: selectedRow)
-                    if audioPlayer.getIsPlaying() && songParams.actualSongIndex == selectedRow {
+                    if audioPlayer.getIsPlaying() && (songParams.actualSongIndex == selectedRow || songParams.title == song) {
                         view.currentSongFromList = true
                     } else {
                         if audioPlayer.getIsPlaying() { audioPlayer.stop() }
@@ -271,10 +273,12 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate {
                 songParams.maxIndexSongs = cfm.getCountFiles()
                 songParams.isShuffleModeActive = !songParams.isShuffleModeActive
                 songParams.isRepeatModeActive = !songParams.isRepeatModeActive
-                songParams.actualSongIndex = selectedRow
+                songParams.actualSongIndex = cfm.getFiles().firstIndex(of: song)!
             }
         }
         audioPlayer.setSongWithParams(songParams: songParams)
+        searchController.searchBar.text = ""
+        // MARK: TODO - isActive = false
     }
     
     // MARK: Funciones de manejo de reproducción

@@ -9,15 +9,7 @@
 import UIKit
 import AVFoundation
 
-extension PlayListListController: UISearchResultsUpdating {
-    func updateSearchResults(for searchController: UISearchController) {
-        let searchBar = searchController.searchBar
-        filterContentForSearchText(searchBar.text!)
-    }
-}
-
-
-class PlayListListController: UITableViewController, AVAudioPlayerDelegate {
+class PlayListListController: UITableViewController, AVAudioPlayerDelegate, UISearchResultsUpdating {
     
     var playlists = [String]()
     
@@ -89,6 +81,11 @@ class PlayListListController: UITableViewController, AVAudioPlayerDelegate {
     }
     
     // MARK: Funciones Search Bar
+    
+    func updateSearchResults(for searchController: UISearchController) {
+        let searchBar = searchController.searchBar
+        filterContentForSearchText(searchBar.text!)
+    }
     
     private func setSearchBar() {
         searchController.searchResultsUpdater = self
@@ -208,6 +205,7 @@ class PlayListListController: UITableViewController, AVAudioPlayerDelegate {
                 }
             }
         }
+        searchController.searchBar.text = ""
     }
     
     /**
