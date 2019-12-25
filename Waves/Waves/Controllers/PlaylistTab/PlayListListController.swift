@@ -205,7 +205,6 @@ class PlayListListController: UITableViewController, AVAudioPlayerDelegate, UISe
                 }
             }
         }
-        searchController.searchBar.text = ""
     }
     
     /**
@@ -243,7 +242,6 @@ class PlayListListController: UITableViewController, AVAudioPlayerDelegate, UISe
                 songParams.actualSongIndex = audioPlayer.prevSong(currentIndex: prev,
                                                         hasShuffle: songParams.isShuffleModeActive)
             }
-            af.resetUIList(tableView, files: cfm.getCountFiles())
         }
         
         let next = cfm.getFile(at: songParams.actualSongIndex)
@@ -270,7 +268,7 @@ class PlayListListController: UITableViewController, AVAudioPlayerDelegate, UISe
     
     @objc private func nextSong() { goNextOrPreviousSong(mode: true, isOnPause: !audioPlayer.getIsPlaying()) }
     
-    // MARK: Funciones Auxiliares
+    // MARK: Funciones Toolbar
     
     /**
     * setToolbarManagement: Añade GestureRecognizers a la toolbar cuando una canción se está reproduciendo.
@@ -330,6 +328,8 @@ class PlayListListController: UITableViewController, AVAudioPlayerDelegate, UISe
         
         toolbarItems = [songToolbarText, artistToolbarText, blank, playButton]
     }
+    
+    // MARK: Función de Alerta
     
     private func createAlert(isModificationMode: Bool, _ index: Int?) {
         var alert: UIAlertController!

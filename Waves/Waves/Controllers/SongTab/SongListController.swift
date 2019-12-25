@@ -277,8 +277,6 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate, UISearch
             }
         }
         audioPlayer.setSongWithParams(songParams: songParams)
-        searchController.searchBar.text = ""
-        // MARK: TODO - isActive = false
     }
     
     // MARK: Funciones de manejo de reproducción
@@ -334,7 +332,7 @@ class SongListController: UITableViewController, AVAudioPlayerDelegate, UISearch
     
     @objc private func nextSong() { goNextOrPreviousSong(mode: true, isOnPause: !audioPlayer.getIsPlaying()) }
     
-    // MARK: Funciones Auxiliares
+    // MARK: Funciones Toolbar
     
     /**
     * setToolbarManagement: Añade GestureRecognizers a la toolbar cuando una canción se está reproduciendo.

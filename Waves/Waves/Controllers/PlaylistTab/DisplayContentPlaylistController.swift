@@ -273,7 +273,6 @@ class DisplayContentPlaylistController: UITableViewController, AVAudioPlayerDele
             }
         }
         audioPlayer.setSongWithParams(songParams: songParams)
-        searchController.searchBar.text = ""
     }
     
     @objc private func addSongs() {
@@ -286,7 +285,7 @@ class DisplayContentPlaylistController: UITableViewController, AVAudioPlayerDele
     * didSelect: Delegado de UITabBar. Actualiza la IU y la canción en función de la pulsación del boton
     * de play/pause, y siguiente/anterior cancion
     */
-    @objc private func managePlayAction() {
+    @objc func managePlayAction() {
         if audioPlayer.getIsPlaying() {
             setToolbarButtonsForPlayingSong(playButton: "play.circle")
             audioPlayer.pause()
@@ -333,7 +332,7 @@ class DisplayContentPlaylistController: UITableViewController, AVAudioPlayerDele
     
     @objc private func nextSong() { goNextOrPreviousSong(mode: true, isOnPause: !audioPlayer.getIsPlaying()) }
     
-    // MARK: Funciones auxiliares
+    // MARK: Funciones Toolbar
     
     /**
     * setToolbarManagement: Añade GestureRecognizers a la toolbar cuando una canción se está reproduciendo.
