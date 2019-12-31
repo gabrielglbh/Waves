@@ -5,7 +5,7 @@ Este reproductor tiene las siguientes funcionalidades:
 
   - Reproducir música en segundo plano.
   - Control de música mediante una toolbar in-app (deslizando hacia la derecha o izquierda)
-  - Control de música mediante periféricos (altavoces/auriculares).
+  - Control de música mediante periféricos (altavoces/auriculares). [Lógica creada pero no probada]
   - Adaptación a Dark/Light Mode.
   - Adaptación a distintas pantallas (iPhone 7 a iPhone 11 Pro Max).
   - Adaptación de distintos idiomas: Inglés y Español.
