@@ -1,17 +1,19 @@
 # Waves
-Reproductor de Música Simple para la asignatura de Desarrollo de iOS del Máster en Desarrollo y Servicios Móviles de la UPM.
+Simple Music Player for iOS for the final assignment of iOS Development of the Service and App Development Master Degree at UPM.
 
-Este reproductor tiene las siguientes funcionalidades:
+In order to add songs to the player, just copy the path that is displayed on the console log of Xcode in the Finder, and drag or copy all the .mp3 files to the openned folder.
 
-  - Reproducir música en segundo plano.
-  - Control de música mediante una toolbar in-app (deslizando hacia la derecha o izquierda)
-  - Control de música mediante periféricos (altavoces/auriculares). [Lógica creada pero no probada]
-  - Adaptación a Dark/Light Mode.
-  - Adaptación a distintas pantallas (iPhone 7 a iPhone 11 Pro Max).
-  - Adaptación de distintos idiomas: Inglés y Español.
-  - Creación de playlists personalizadas en base a la música que se tenga en la biblioteca.
-  - Edición de playlists (mantener pulsado en una playlist).
-  - Eliminar/Mover canciones en playlists y biblioteca.
-  - Disposición de Lyrics en las canciones que dispongan de ellas (source: metadata ID3).
-  - Modo Coche con interfaz ampliada para evitar distracciones.
-  - Búsqueda de canciones o playlists.
+This player has the following functionalities:
+
+  - Playing music in background.
+  - Music management through toolbar (sliding right or left).
+  - Music management through periferals (not tested).
+  - Dark/Light Themed.
+  - Responsive design (tested from iPhone 7 to iPhone 11 Pro Max).
+  - Languages: Spanish and English.
+  - Creation of customized playlists.
+  - Management of playlists (hold on playlist to edit).
+  - Management of songs in playlists and/or library.
+  - Lyrics displayment (availability depends on ID3 metadata of the song).
+  - Car mode.
+  - Search of songs.
